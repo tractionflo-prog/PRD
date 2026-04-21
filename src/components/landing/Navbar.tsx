@@ -1,7 +1,9 @@
 "use client";
 
-import type { MouseEvent } from "react";
+import { cn } from "@/lib/cn";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { type MouseEvent, useEffect, useState } from "react";
 import { ScrollCta } from "./ScrollCta";
 
 const BRAND = "Tractionflo";
@@ -11,6 +13,8 @@ const links = [
   { label: "Process", hash: "process" },
   { label: "Join", hash: "join" },
 ] as const;
+
+const NAV_CLEARANCE = 72;
 
 function smoothHashNav(e: MouseEvent<HTMLAnchorElement>, hash: string) {
   if (typeof window === "undefined") return;
@@ -23,8 +27,47 @@ function smoothHashNav(e: MouseEvent<HTMLAnchorElement>, hash: string) {
 }
 
 export function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const [pastHero, setPastHero] = useState(false);
+
+  useEffect(() => {
+    if (!isHome) {
+      setPastHero(true);
+      return;
+    }
+
+    const run = () => {
+      const hero = document.getElementById("overview");
+      if (!hero) {
+        setPastHero(true);
+        return;
+      }
+      const bottom = hero.getBoundingClientRect().bottom;
+      setPastHero(bottom < NAV_CLEARANCE);
+    };
+
+    run();
+    window.addEventListener("scroll", run, { passive: true });
+    window.addEventListener("resize", run);
+    return () => {
+      window.removeEventListener("scroll", run);
+      window.removeEventListener("resize", run);
+    };
+  }, [isHome]);
+
+  const cinematic = isHome && !pastHero;
+
   return (
-    <header className="sticky top-0 z-50 border-b border-[#ECECEC] bg-white/90 backdrop-blur-md">
+    <header
+      className={cn(
+        "top-0 z-50 w-full border-b transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300",
+        isHome ? "fixed" : "sticky",
+        cinematic
+          ? "border-white/10 bg-black/25 shadow-none backdrop-blur-md"
+          : "border-[#ECECEC] bg-white/90 shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur-md",
+      )}
+    >
       <nav
         className="mx-auto flex min-h-[3.25rem] max-w-[1200px] flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 sm:h-14 sm:min-h-0 sm:gap-6 sm:px-8 sm:py-0"
         aria-label="Primary"
@@ -32,7 +75,10 @@ export function Navbar() {
         <Link
           href="/#overview"
           onClick={(e) => smoothHashNav(e, "overview")}
-          className="min-h-11 min-w-11 shrink-0 py-2 text-[15px] font-semibold tracking-[-0.02em] text-[#0A0A0A] sm:text-[16px]"
+          className={cn(
+            "min-h-11 min-w-11 shrink-0 py-2 text-[15px] font-semibold tracking-[-0.02em] sm:text-[16px]",
+            cinematic ? "text-white" : "text-[#0A0A0A]",
+          )}
         >
           {BRAND}
         </Link>
@@ -44,7 +90,13 @@ export function Navbar() {
                 <Link
                   href={`/#${link.hash}`}
                   onClick={(e) => smoothHashNav(e, link.hash)}
-                  className="inline-flex min-h-11 items-center rounded-md px-1 text-[13px] font-medium text-[#6B7280] transition-colors hover:text-[#2563EB] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]/35 sm:px-0 sm:text-[15px]"
+                  className={cn(
+                    "inline-flex min-h-11 items-center rounded-md px-1 text-[13px] font-medium transition-colors sm:px-0 sm:text-[15px]",
+                    cinematic
+                      ? "text-white/85 hover:text-white focus-visible:outline-white/40"
+                      : "text-[#6B7280] hover:text-[#2563EB] focus-visible:outline-[#2563EB]/35",
+                    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+                  )}
                 >
                   {link.label}
                 </Link>

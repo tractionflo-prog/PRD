@@ -3,7 +3,6 @@ import {
   EmailCapture,
   FinalCta,
   Hero,
-  HowItWorks,
   ProblemSection,
   ProductPreview,
   ValueSection,
@@ -19,7 +18,6 @@ export default function Home() {
         <ProblemSection />
         <ProductPreview />
         <BeliefShift />
-        <HowItWorks />
         <WhoItsFor />
         <FinalCta />
         <EmailCapture />

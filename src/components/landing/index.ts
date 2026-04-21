@@ -4,7 +4,6 @@ export { FadeUp } from "./FadeUp";
 export { FinalCta } from "./FinalCta";
 export { Hero } from "./Hero";
 export { HeroMockup } from "./HeroMockup";
-export { HowItWorks } from "./HowItWorks";
 export { Navbar } from "./Navbar";
 export { PrimaryButton } from "./PrimaryButton";
 export { ProblemSection } from "./ProblemSection";

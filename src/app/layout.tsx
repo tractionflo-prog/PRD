@@ -27,9 +27,9 @@ const geistMono = Geist_Mono({
 });
 
 const titleDefault =
-  "Tractionflo — Get first users without doing all the outreach";
+  "Tractionflo — Get your first users without cold outreach";
 const description =
-  "Tractionflo helps founders find real leads, draft outreach, and approve messages—so distribution doesn’t die in your drafts. Join early access.";
+  "For founders who built something but need traction: find people already looking for tools like yours, review suggested messages, and approve before anything sends. Early access.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -44,8 +44,8 @@ export const metadata: Metadata = {
     "first users",
     "founder distribution",
     "early-stage SaaS",
-    "outreach automation",
-    "lead generation for startups",
+    "early users",
+    "founder traction",
     "waitlist",
   ],
   authors: [{ name: "Tractionflo" }],
