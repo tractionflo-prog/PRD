@@ -1,6 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { gaEvent } from "@/lib/analytics";
+import type { EmailHint } from "@/lib/send-waitlist-email";
+
+function waitlistMessageForHint(hint: string | undefined): string {
+  const h = hint as EmailHint | undefined;
+  switch (h) {
+    case "missing_api_key":
+      return "You’re on the list. Confirmation email isn’t turned on yet (add RESEND_API_KEY where the app runs, e.g. Vercel env). Your signup is saved.";
+    case "resend_test_recipient_only":
+      return "You’re on the list. With Resend’s test sender (onboarding@resend.dev), confirmations only go to the email on your Resend account — sign up with that address, or verify a domain in Resend and set RESEND_FROM_EMAIL. Your signup is saved.";
+    case "verify_domain_required":
+      return "You’re on the list. Resend needs a verified sending domain before it can email arbitrary addresses. Add a domain at resend.com/domains, then set RESEND_FROM_EMAIL. Your signup is saved.";
+    case "invalid_api_key":
+      return "You’re on the list. Resend rejected the API key — create a new key in the Resend dashboard and update RESEND_API_KEY. Your signup is saved.";
+    case "send_failed":
+      return "You’re on the list. The mail service hit an error while sending — check the server logs and your Resend dashboard. Your signup is saved; try again after fixing Resend (often: verify a domain and set RESEND_FROM_EMAIL, or use your Resend login email while testing).";
+    default:
+      return "You’re on the list. We couldn’t send a confirmation email right now. Your signup is saved — check spam or try again after email is fixed.";
+  }
+}
 import { FadeUp } from "./FadeUp";
 import { PrimaryButton } from "./PrimaryButton";
 import { Section } from "./Section";
@@ -18,10 +38,17 @@ export function EmailCapture() {
     const fd = new FormData(form);
     const email = String(fd.get("email") ?? "").trim();
     const building = String(fd.get("building") ?? "").trim();
+    const honeypot = String(fd.get("website") ?? "").trim();
 
     if (!email) {
       setStatus("error");
       setMessage("Add your email so we can reach you.");
+      return;
+    }
+
+    if (honeypot) {
+      setStatus("success");
+      setMessage("You’re on the list. We’ll be in touch.");
       return;
     }
 
@@ -36,6 +63,8 @@ export function EmailCapture() {
       });
       const data = (await res.json().catch(() => ({}))) as {
         error?: string;
+        confirmationEmailSent?: boolean;
+        confirmationEmailHint?: string;
       };
 
       if (!res.ok) {
@@ -45,7 +74,14 @@ export function EmailCapture() {
       }
 
       setStatus("success");
-      setMessage("You’re on the list. We’ll be in touch.");
+      if (data.confirmationEmailSent) {
+        setMessage(
+          "You’re on the list. We sent a confirmation to your inbox — check spam if you don’t see it.",
+        );
+      } else {
+        setMessage(waitlistMessageForHint(data.confirmationEmailHint));
+      }
+      gaEvent("waitlist_signup", { method: "early_access_form" });
       form.reset();
     } catch {
       setStatus("error");
@@ -70,7 +106,11 @@ export function EmailCapture() {
             </p>
 
             {status === "success" ? (
-              <p className="mt-8 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] px-4 py-3 text-[15px] font-medium text-[#16A34A]">
+              <p
+                className="mt-8 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] px-4 py-3 text-[15px] font-medium text-[#16A34A]"
+                role="status"
+                aria-live="polite"
+              >
                 {message}
               </p>
             ) : (
@@ -108,8 +148,19 @@ export function EmailCapture() {
                   />
                 </div>
 
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-[-9999px] h-px w-px opacity-0"
+                />
+
                 {status === "error" && message && (
-                  <p className="text-[15px] text-red-600">{message}</p>
+                  <p className="text-[15px] text-red-600" role="alert">
+                    {message}
+                  </p>
                 )}
 
                 <PrimaryButton

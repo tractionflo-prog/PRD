@@ -159,7 +159,7 @@ export function ProductPreview() {
             <Dot live />
           </div>
           <span className="text-[12px] font-medium text-[#9CA3AF]">
-            firstusers.app
+            tractionflo.app
           </span>
           <div className="w-10" />
         </div>

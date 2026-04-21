@@ -17,10 +17,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid payload." }, { status: 400 });
   }
 
-  const { email, building } = body as {
+  const { email, building, website } = body as {
     email?: unknown;
     building?: unknown;
+    /** Honeypot — must be empty (bots often fill hidden fields). */
+    website?: unknown;
   };
+
+  if (
+    website !== undefined &&
+    website !== null &&
+    typeof website === "string" &&
+    website.trim() !== ""
+  ) {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  }
 
   if (typeof email !== "string" || !EMAIL.test(email.trim())) {
     return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
@@ -51,11 +62,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: msg }, { status: 503 });
   }
 
+  let confirmationEmailSent = false;
+  let confirmationEmailHint: string | undefined;
+
   try {
-    await sendWaitlistConfirmationEmail(trimmed, note || undefined);
+    const emailResult = await sendWaitlistConfirmationEmail(
+      trimmed,
+      note || undefined,
+    );
+    confirmationEmailSent = emailResult.sent;
+    if (!emailResult.sent) {
+      confirmationEmailHint = emailResult.hint;
+    }
   } catch (err) {
     console.error("[early-access] confirmation email", err);
+    confirmationEmailHint = "send_failed";
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({
+    ok: true,
+    confirmationEmailSent,
+    ...(confirmationEmailHint ? { confirmationEmailHint } : {}),
+  });
 }

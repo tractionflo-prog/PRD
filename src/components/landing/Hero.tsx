@@ -12,10 +12,10 @@ export function Hero() {
       <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,1fr)] lg:gap-16 xl:gap-20">
         <div className="max-w-[32rem]">
           <FadeUp>
-            <p className="inline-flex items-center rounded-full border border-[#EDE9FE] bg-[#F5F3FF] px-3 py-1 text-[13px] font-medium tracking-wide text-[#7C3AED]">
-              Early access for founders
+            <p className="inline-flex max-w-full items-center rounded-full border border-[#EDE9FE] bg-[#F5F3FF] px-3 py-1.5 text-[12px] font-medium tracking-wide text-[#7C3AED] sm:text-[13px]">
+              Tractionflo · early access for founders
             </p>
-            <h1 className="mt-5 text-balance text-[2rem] font-semibold leading-[1.12] tracking-tight text-[#0A0A0A] sm:text-[2.5rem] sm:leading-[1.1] lg:text-[3.25rem] lg:leading-[1.06]">
+            <h1 className="mt-4 text-balance text-[1.75rem] font-semibold leading-[1.12] tracking-tight text-[#0A0A0A] sm:mt-5 sm:text-[2.5rem] sm:leading-[1.1] lg:text-[3.25rem] lg:leading-[1.06]">
               Get your{" "}
               <span className="text-[#2563EB]">first users</span>
               {" "}— without doing all the outreach.

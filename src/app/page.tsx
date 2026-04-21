@@ -4,7 +4,6 @@ import {
   FinalCta,
   Hero,
   HowItWorks,
-  Navbar,
   ProblemSection,
   ProductPreview,
   ValueSection,
@@ -14,7 +13,6 @@ import {
 export default function Home() {
   return (
     <>
-      <Navbar />
       <main className="relative min-h-screen bg-white text-[#0A0A0A] antialiased">
         <Hero />
         <ValueSection />

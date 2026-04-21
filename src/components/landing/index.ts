@@ -11,6 +11,7 @@ export { ProblemSection } from "./ProblemSection";
 export { ProductPreview } from "./ProductPreview";
 export { ScrollCta } from "./ScrollCta";
 export { Section } from "./Section";
+export { SiteFooter } from "./SiteFooter";
 export { SurfaceCard } from "./SurfaceCard";
 export { ValueSection } from "./ValueSection";
 export { WhoItsFor } from "./WhoItsFor";

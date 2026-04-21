@@ -42,10 +42,12 @@ function LeadRow({
     <div
       className={`rounded-lg border px-3 py-2 sm:px-3.5 sm:py-2.5 ${active || dim} ${className}`}
     >
-      <p className="text-[12px] font-medium leading-snug text-[#0A0A0A] sm:text-[13px]">
+      <p className="text-[11.5px] font-medium leading-snug text-[#0A0A0A] sm:text-[13px]">
         {line}
       </p>
-      <p className="mt-0.5 text-[10px] text-[#9CA3AF]">{meta}</p>
+      <p className="mt-0.5 text-[10px] leading-snug text-[#9CA3AF] sm:text-[11px]">
+        {meta}
+      </p>
     </div>
   );
 }

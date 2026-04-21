@@ -33,7 +33,10 @@ const cards = [
 
 export function ValueSection() {
   return (
-    <Section className="border-b border-[#ECECEC] bg-white py-20 sm:py-24 md:py-28 lg:py-32">
+    <Section
+      id="process"
+      className="scroll-mt-14 border-b border-[#ECECEC] bg-white py-20 sm:py-24 md:py-28 lg:py-32"
+    >
       <FadeUp>
         <h2 className="max-w-[44rem] text-balance text-[1.75rem] font-semibold leading-[1.2] tracking-tight text-[#0A0A0A] sm:text-3xl lg:text-[2.125rem]">
           Tell us what you built → We help you get{" "}

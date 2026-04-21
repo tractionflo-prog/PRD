@@ -124,8 +124,8 @@ function MockChrome() {
         Inbox
       </span>
       <div className="flex items-center gap-2" aria-hidden>
-        <span className="hidden rounded-full border border-[#EDE9FE] bg-[#F5F3FF] px-2.5 py-0.5 text-[11px] font-medium text-[#7C3AED] sm:inline">
-          FirstUsers
+        <span className="rounded-full border border-[#EDE9FE] bg-[#F5F3FF] px-2 py-0.5 text-[10px] font-medium text-[#7C3AED] sm:px-2.5 sm:text-[11px]">
+          Tractionflo
         </span>
         <div className="flex items-center gap-1">
           <span className="h-1.5 w-1.5 rounded-full bg-[#E5E7EB]" />

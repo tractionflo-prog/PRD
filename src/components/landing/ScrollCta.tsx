@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 type ScrollCtaProps = {
@@ -8,21 +9,27 @@ type ScrollCtaProps = {
   href?: string;
   className?: string;
   variant?: "primary" | "subtle";
+  "aria-label"?: string;
 };
 
 export function ScrollCta({
   children,
-  href = "#join",
+  href = "/#join",
   className,
   variant = "primary",
+  "aria-label": ariaLabel,
 }: ScrollCtaProps) {
   return (
-    <a
+    <Link
       href={href}
+      aria-label={ariaLabel}
       onClick={(e) => {
-        const id = href.replace("#", "");
+        const id = href.includes("#")
+          ? href.split("#").pop() ?? ""
+          : href.replace(/^#/, "");
+        if (!id) return;
         const el = document.getElementById(id);
-        if (el) {
+        if (el && window.location.pathname === "/") {
           e.preventDefault();
           el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
@@ -36,6 +43,6 @@ export function ScrollCta({
       )}
     >
       {children}
-    </a>
+    </Link>
   );
 }

@@ -1,25 +1,120 @@
-import type { Metadata } from "next";
+import { Navbar } from "@/components/landing/Navbar";
+import { SiteFooter } from "@/components/landing/SiteFooter";
+import { getSiteUrl } from "@/lib/site";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID =
-  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-NNZX850SJS";
+  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() ?? "G-NNZX850SJS";
+const ENABLE_GA =
+  process.env.NODE_ENV === "production" ||
+  process.env.NEXT_PUBLIC_ENABLE_GA === "1";
+
+const siteUrl = getSiteUrl();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
+const titleDefault =
+  "Tractionflo — Get first users without doing all the outreach";
+const description =
+  "Tractionflo helps founders find real leads, draft outreach, and approve messages—so distribution doesn’t die in your drafts. Join early access.";
+
 export const metadata: Metadata = {
-  title: "FirstUsers — Get your first users",
-  description:
-    "FirstUsers helps founders get their first users without doing all the outreach manually. Early access.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: titleDefault,
+    template: "%s | Tractionflo",
+  },
+  description,
+  applicationName: "Tractionflo",
+  keywords: [
+    "Tractionflo",
+    "first users",
+    "founder distribution",
+    "early-stage SaaS",
+    "outreach automation",
+    "lead generation for startups",
+    "waitlist",
+  ],
+  authors: [{ name: "Tractionflo" }],
+  creator: "Tractionflo",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: "Tractionflo",
+    title: titleDefault,
+    description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: titleDefault,
+    description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: "/icon.svg",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2563EB",
+  width: "device-width",
+  initialScale: 1,
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      url: siteUrl,
+      name: "Tractionflo",
+      description,
+      publisher: { "@id": `${siteUrl}/#organization` },
+      inLanguage: "en-US",
+    },
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "Tractionflo",
+      url: siteUrl,
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "Tractionflo",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+        description: "Early access waitlist",
+      },
+      description,
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -33,19 +128,29 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full bg-white text-[#0A0A0A]">
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
+        {ENABLE_GA && GA_MEASUREMENT_ID ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${GA_MEASUREMENT_ID}');
           `}
-        </Script>
+            </Script>
+          </>
+        ) : null}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <Navbar />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
