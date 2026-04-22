@@ -9,7 +9,7 @@ export function Hero() {
   return (
     <section
       id="overview"
-      className="relative isolate w-full scroll-mt-14 overflow-hidden bg-[#0A0A0A]"
+      className="relative isolate w-full scroll-mt-24 overflow-hidden bg-[#0A0A0A] sm:scroll-mt-20"
     >
       <div className="pointer-events-none absolute inset-0 z-0">
         <Image
@@ -28,8 +28,8 @@ export function Hero() {
         />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1200px] flex-col justify-start px-5 pb-20 pt-[4.75rem] sm:px-8 sm:pb-24 md:justify-center md:px-10 md:pb-28 md:pt-[4.75rem] lg:pb-32 lg:pt-24">
-        <div className="max-w-[600px] text-left">
+      <div className="relative z-10 mx-auto flex min-h-screen min-h-[100svh] w-full min-w-0 max-w-[1200px] flex-col justify-start px-5 pb-[max(5rem,env(safe-area-inset-bottom,0px))] pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1rem)] sm:px-8 sm:pb-24 md:justify-center md:px-10 md:pb-28 md:pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] lg:pb-32 lg:pt-24">
+        <div className="max-w-[600px] min-w-0 text-left">
           <FadeUp>
             <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-white/80 sm:text-[13px]">
               Early access for founders who got 0 signups
@@ -59,10 +59,10 @@ export function Hero() {
           </FadeUp>
 
           <FadeUp delay={0.11} className="mt-9 flex flex-col gap-3 sm:mt-10">
-            <div className="w-fit rounded-full shadow-[0_4px_16px_rgba(37,99,235,0.45)] transition-shadow duration-200 hover:shadow-[0_6px_22px_rgba(29,78,216,0.5)]">
+            <div className="w-full max-w-full rounded-full shadow-[0_4px_16px_rgba(37,99,235,0.45)] transition-shadow duration-200 hover:shadow-[0_6px_22px_rgba(29,78,216,0.5)] sm:w-fit">
               <ScrollCta
                 href="/#join"
-                className="h-12 w-full min-w-[12rem] rounded-full !shadow-none px-8 text-[15px] font-semibold transition hover:bg-[#1D4ED8]"
+                className="h-12 w-full max-w-full min-w-0 rounded-full !shadow-none px-6 text-[15px] font-semibold transition hover:bg-[#1D4ED8] sm:min-w-[12rem] sm:px-8"
               >
                 Get my first users
               </ScrollCta>

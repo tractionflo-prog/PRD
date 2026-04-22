@@ -81,6 +81,7 @@ export const viewport: Viewport = {
   themeColor: "#2563EB",
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 const jsonLd = {
@@ -127,7 +128,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
     >
-      <body className="min-h-full bg-white text-[#0A0A0A]">
+      <body className="min-h-full min-w-0 overflow-x-clip bg-white text-[#0A0A0A]">
         {ENABLE_GA && GA_MEASUREMENT_ID ? (
           <>
             <Script

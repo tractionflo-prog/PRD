@@ -92,7 +92,7 @@ export function EmailCapture() {
   return (
     <Section
       id="join"
-      className="scroll-mt-14 bg-[#FAFAFA] pb-20 pt-14 sm:pb-24 md:pb-28"
+      className="scroll-mt-24 bg-[#FAFAFA] pb-20 pt-14 sm:scroll-mt-20 sm:pb-24 md:pb-28"
     >
       <FadeUp>
         <SurfaceCard className="relative mx-auto max-w-lg overflow-hidden border-[#E8E8E8] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_24px_48px_-28px_rgba(15,23,42,0.1)]">

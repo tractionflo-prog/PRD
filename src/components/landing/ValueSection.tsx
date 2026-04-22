@@ -28,7 +28,7 @@ export function ValueSection() {
   return (
     <Section
       id="process"
-      className="scroll-mt-14 border-b border-[#ECECEC] bg-white py-16 sm:py-20 md:py-24"
+      className="scroll-mt-24 border-b border-[#ECECEC] bg-white py-16 sm:scroll-mt-20 sm:py-20 md:py-24"
     >
       <FadeUp>
         <h2 className="max-w-[38rem] text-balance text-[1.875rem] font-semibold leading-[1.14] tracking-tight text-[#0A0A0A] sm:text-[2.125rem] lg:text-[2.375rem]">

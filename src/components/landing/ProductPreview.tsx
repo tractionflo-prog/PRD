@@ -116,7 +116,7 @@ function Row({ item }: { item: LeadItem }) {
           </p>
           <SourceBadge source={item.source} />
         </div>
-        <p className="mt-0.5 truncate text-[13px] text-[#64748B] sm:text-[14px]">
+        <p className="mt-0.5 line-clamp-2 break-words text-[13px] text-[#64748B] sm:truncate sm:text-[14px]">
           {item.preview}
         </p>
       </div>

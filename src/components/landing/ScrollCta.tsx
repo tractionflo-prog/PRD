@@ -31,7 +31,11 @@ export function ScrollCta({
         const el = document.getElementById(id);
         if (el && window.location.pathname === "/") {
           e.preventDefault();
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          el.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+            inline: "nearest",
+          });
         }
       }}
       className={cn(

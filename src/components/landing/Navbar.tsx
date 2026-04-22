@@ -3,7 +3,7 @@
 import { cn } from "@/lib/cn";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type MouseEvent, useEffect, useState } from "react";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { ScrollCta } from "./ScrollCta";
 
 const BRAND = "Tractionflo";
@@ -14,7 +14,8 @@ const links = [
   { label: "Join", hash: "join" },
 ] as const;
 
-const NAV_CLEARANCE = 72;
+/** Hero bottom above this (px) ⇒ solid nav. Slightly above actual bar height for iOS scroll quirks. */
+const NAV_CLEARANCE = 80;
 
 function smoothHashNav(e: MouseEvent<HTMLAnchorElement>, hash: string) {
   if (typeof window === "undefined") return;
@@ -30,6 +31,7 @@ export function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const [pastHero, setPastHero] = useState(false);
+  const ticking = useRef(false);
 
   useEffect(() => {
     if (!isHome) {
@@ -47,12 +49,21 @@ export function Navbar() {
       setPastHero(bottom < NAV_CLEARANCE);
     };
 
+    const onScrollOrResize = () => {
+      if (ticking.current) return;
+      ticking.current = true;
+      requestAnimationFrame(() => {
+        ticking.current = false;
+        run();
+      });
+    };
+
     run();
-    window.addEventListener("scroll", run, { passive: true });
-    window.addEventListener("resize", run);
+    window.addEventListener("scroll", onScrollOrResize, { passive: true });
+    window.addEventListener("resize", onScrollOrResize);
     return () => {
-      window.removeEventListener("scroll", run);
-      window.removeEventListener("resize", run);
+      window.removeEventListener("scroll", onScrollOrResize);
+      window.removeEventListener("resize", onScrollOrResize);
     };
   }, [isHome]);
 
@@ -61,7 +72,7 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "top-0 z-50 w-full border-b transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300",
+        "top-0 z-50 w-full border-b pt-[env(safe-area-inset-top,0px)] transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300",
         isHome ? "fixed" : "sticky",
         cinematic
           ? "border-white/10 bg-black/25 shadow-none backdrop-blur-md"
@@ -69,7 +80,7 @@ export function Navbar() {
       )}
     >
       <nav
-        className="mx-auto flex min-h-[3.25rem] max-w-[1200px] flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 sm:h-14 sm:min-h-0 sm:gap-6 sm:px-8 sm:py-0"
+        className="mx-auto flex min-h-[3.25rem] w-full min-w-0 max-w-[1200px] flex-wrap items-center justify-between gap-x-2 gap-y-2 px-4 py-2 sm:h-14 sm:min-h-0 sm:gap-x-6 sm:gap-y-0 sm:px-8 sm:py-0"
         aria-label="Primary"
       >
         <Link
@@ -83,8 +94,8 @@ export function Navbar() {
           {BRAND}
         </Link>
 
-        <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-8">
-          <ul className="flex min-w-0 items-center gap-3 overflow-x-auto sm:gap-8">
+        <div className="flex min-w-0 max-w-full flex-1 basis-[min(100%,18rem)] items-center justify-end gap-2 sm:basis-auto sm:gap-8">
+          <ul className="flex min-w-0 max-w-full flex-1 items-center justify-end gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-none sm:gap-8 [&::-webkit-scrollbar]:hidden">
             {links.map((link) => (
               <li key={link.hash} className="shrink-0">
                 <Link
@@ -105,7 +116,7 @@ export function Navbar() {
           </ul>
           <ScrollCta
             href="/#join"
-            className="h-11 shrink-0 px-4 text-[14px] sm:h-10 sm:px-6 sm:text-[15px]"
+            className="h-11 max-w-full shrink-0 px-3 text-[13px] sm:h-10 sm:px-6 sm:text-[15px]"
             variant="primary"
             aria-label="Get early access — go to signup form"
           >
