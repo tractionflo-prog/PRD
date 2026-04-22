@@ -92,10 +92,10 @@ export function EmailCapture() {
   return (
     <Section
       id="join"
-      className="scroll-mt-24 bg-[#FAFAFA] pb-20 pt-14 sm:scroll-mt-20 sm:pb-24 md:pb-28"
+      className="scroll-mt-24 bg-[#F8FAFD] pb-24 pt-16 sm:scroll-mt-20 sm:pb-28 sm:pt-20 md:pb-32 md:pt-24"
     >
       <FadeUp>
-        <SurfaceCard className="relative mx-auto max-w-lg overflow-hidden border-[#E8E8E8] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_24px_48px_-28px_rgba(15,23,42,0.1)]">
+        <SurfaceCard className="relative mx-auto max-w-lg overflow-hidden border-transparent bg-white shadow-[0_16px_36px_-24px_rgba(15,23,42,0.25)] ring-1 ring-[#E5E7EB]/70">
           <div className="absolute left-0 top-0 h-full w-1 bg-[#2563EB]" aria-hidden />
           <div className="p-8 sm:p-10 sm:pl-11">
             <h2 className="text-2xl font-semibold tracking-tight text-[#0A0A0A] sm:text-[1.75rem]">

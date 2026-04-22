@@ -75,7 +75,7 @@ export function Navbar() {
         "top-0 z-50 w-full border-b pt-[env(safe-area-inset-top,0px)] transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300",
         isHome ? "fixed" : "sticky",
         cinematic
-          ? "border-white/10 bg-black/25 shadow-none backdrop-blur-md"
+          ? "border-white/5 bg-black/55 shadow-[0_8px_24px_-20px_rgba(0,0,0,0.75)] backdrop-blur-[10px]"
           : "border-[#ECECEC] bg-white/90 shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur-md",
       )}
     >

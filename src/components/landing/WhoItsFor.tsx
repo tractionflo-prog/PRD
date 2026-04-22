@@ -11,55 +11,61 @@ const items = [
   {
     text: "have launched before",
     Icon: IconRocket,
-    wrap: "border-[#BFDBFE] bg-[#EFF6FF] text-[#2563EB]",
+    wrap: "text-[#2563EB]",
   },
   {
     text: "struggled to get users",
     Icon: IconUsers,
-    wrap: "border-[#EDE9FE] bg-[#F5F3FF] text-[#7C3AED]",
+    wrap: "text-[#7C3AED]",
   },
   {
     text: "are tired of outreach that goes nowhere",
     Icon: IconMessage,
-    wrap: "border-[#BFDBFE] bg-[#EFF6FF] text-[#2563EB]",
+    wrap: "text-[#2563EB]",
   },
   {
     text: "want a simpler way to validate ideas",
     Icon: IconCheck,
-    wrap: "border-[#BBF7D0] bg-[#F0FDF4] text-[#16A34A]",
+    wrap: "text-[#16A34A]",
   },
 ] as const;
 
 export function WhoItsFor() {
   return (
-    <Section className="border-b border-[#ECECEC] bg-[#FAFAFA] py-14 sm:py-16 md:py-20">
+    <Section className="bg-[#F8FAFC] py-20">
       <FadeUp>
-        <h2 className="text-[1.875rem] font-semibold leading-tight tracking-tight text-[#0A0A0A] sm:text-[2rem] lg:text-[2.125rem]">
+        <h2 className="max-w-[26rem] text-[2.1rem] font-semibold leading-[1.1] tracking-tight text-[#0A0A0A] sm:max-w-[30rem] sm:text-[2.3rem] lg:text-[2.45rem]">
           Built for founders who
         </h2>
       </FadeUp>
 
-      <ul className="mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
-        {items.map((item, i) => {
-          const Icon = item.Icon;
-          return (
-            <li key={item.text}>
-              <FadeUp delay={0.04 * i}>
-                <div className="flex h-full items-center gap-3.5 rounded-xl border border-[#E5E7EB] bg-white px-4 py-4 shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-shadow hover:border-[#E0E7FF] hover:shadow-[0_8px_24px_-16px_rgba(37,99,235,0.12)] sm:px-5 sm:py-4">
-                  <span
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${item.wrap}`}
+      <div className="mx-auto mt-10 max-w-[980px] sm:mt-12">
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+          {items.map((item, i) => {
+            const Icon = item.Icon;
+            return (
+              <li key={item.text}>
+                <FadeUp delay={0.04 * i}>
+                  <div
+                    className={`group flex h-full items-center gap-3.5 rounded-[14px] border border-transparent bg-white px-5 py-4 shadow-[0_8px_25px_rgba(0,0,0,0.04)] transition-all duration-200 hover:-translate-y-[3px] hover:shadow-[0_15px_40px_rgba(0,0,0,0.08)] sm:px-5 sm:py-4 ${
+                      i === 1 || i === 2 ? "sm:scale-[1.03]" : ""
+                    }`}
                   >
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <p className="text-[15px] font-semibold leading-snug text-[#0F172A]">
-                    {item.text}
-                  </p>
-                </div>
-              </FadeUp>
-            </li>
-          );
-        })}
-      </ul>
+                    <span
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[rgba(59,130,246,0.08)] shadow-[0_6px_20px_rgba(59,130,246,0.12)] transition-transform duration-200 group-hover:-translate-y-0.5 ${item.wrap}`}
+                    >
+                      <Icon className="h-6 w-6" />
+                    </span>
+                    <p className="text-[15px] font-semibold leading-snug text-[#1E293B] transition-colors duration-200 group-hover:text-[#0F172A]">
+                      {item.text}
+                    </p>
+                  </div>
+                </FadeUp>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </Section>
   );
 }
