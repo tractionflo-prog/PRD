@@ -9,26 +9,32 @@ export function Hero() {
   return (
     <section
       id="overview"
-      className="relative isolate w-full scroll-mt-24 overflow-hidden bg-[#0A0A0A] sm:scroll-mt-20"
+      className="relative isolate flex min-h-screen w-full min-w-0 flex-col overflow-hidden bg-[#0A0A0A] scroll-mt-24 supports-[min-height:100svh]:min-h-[100svh] sm:scroll-mt-20"
     >
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <Image
-          src="/hero.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          quality={85}
-          className="object-cover object-center"
-        />
+      {/* Full-bleed background: relative box required for next/image fill on mobile WebKit */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 min-h-full w-full"
+        aria-hidden
+      >
+        <div className="relative h-full min-h-screen w-full min-w-0 supports-[min-height:100svh]:min-h-[100svh]">
+          <Image
+            src="/hero.png"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            quality={85}
+            className="object-cover object-[center_22%] md:object-center"
+            decoding="async"
+          />
+        </div>
         <div
-          className="absolute inset-0 z-[1]"
+          className="absolute inset-0 z-[1] min-h-full w-full"
           style={{ background: OVERLAY }}
-          aria-hidden
         />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-screen min-h-[100svh] w-full min-w-0 max-w-[1200px] flex-col justify-start px-5 pb-[max(5rem,env(safe-area-inset-bottom,0px))] pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1rem)] sm:px-8 sm:pb-24 md:justify-center md:px-10 md:pb-28 md:pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] lg:pb-32 lg:pt-24">
+      <div className="relative z-10 mx-auto flex w-full min-w-0 max-w-[1200px] flex-1 flex-col justify-start px-5 pb-[max(5rem,env(safe-area-inset-bottom,0px))] pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1rem)] sm:px-8 sm:pb-24 md:justify-center md:px-10 md:pb-28 md:pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] lg:pb-32 lg:pt-24">
         <div className="max-w-[600px] min-w-0 text-left">
           <FadeUp>
             <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-white/80 sm:text-[13px]">
