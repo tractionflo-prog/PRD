@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/cn";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type LeadItem = {
@@ -49,20 +50,20 @@ function Dot({ live }: { live?: boolean }) {
 function StatusPill({ status }: { status: LeadItem["status"] }) {
   if (status === "Ready") {
     return (
-      <span className="rounded-full border border-[#BBF7D0] bg-[#F0FDF4] px-2 py-0.5 text-[11px] font-semibold text-[#16A34A]">
+      <span className="rounded-full border border-[#BBF7D0] bg-[#F0FDF4] px-2 py-0.5 text-[11px] font-semibold text-[#16A34A] transition-[background-color,border-color,color] duration-[400ms] ease-out">
         Ready
       </span>
     );
   }
   if (status === "Queued") {
     return (
-      <span className="rounded-full border border-[#BFDBFE] bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-semibold text-[#2563EB]">
+      <span className="rounded-full border border-[#BFDBFE] bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-semibold text-[#2563EB] transition-[background-color,border-color,color] duration-[400ms] ease-out">
         Queued
       </span>
     );
   }
   return (
-    <span className="rounded-full border border-[#E5E7EB] bg-[#F9FAFB] px-2 py-0.5 text-[11px] font-semibold text-[#475569]">
+    <span className="rounded-full border border-[#E5E7EB] bg-[#F9FAFB] px-2 py-0.5 text-[11px] font-semibold text-[#475569] transition-[background-color,border-color,color] duration-[400ms] ease-out">
       New
     </span>
   );
@@ -222,7 +223,7 @@ export function ProductDemo() {
                 className={`mb-1 flex items-center justify-between rounded-xl px-3.5 py-2.5 text-[15px] transition-colors ${
                   item.active
                     ? "bg-[#EFF6FF] font-semibold text-[#2563EB]"
-                    : "font-medium text-[#475569] hover:bg-[#FAFAFA]"
+                    : "font-medium text-[#475569] can-hover:hover:bg-[#FAFAFA]"
                 }`}
               >
                 <span>{item.name}</span>
@@ -246,7 +247,7 @@ export function ProductDemo() {
           <div className="flex items-center justify-between border-b border-[#F0F0F0] px-5 py-3.5 sm:px-6">
             <h3 className="text-[15px] font-semibold text-[#0A0A0A]">Leads</h3>
             <span
-              className={`rounded-full border px-3 py-1 text-[12px] font-semibold transition-all duration-300 ${
+              className={`rounded-full border px-3 py-1 text-[12px] font-semibold transition-[background-color,border-color,color] duration-[400ms] ease-out ${
                 sent
                   ? "border-[#93C5FD] bg-[#EFF6FF] text-[#1D4ED8]"
                   : "border-[#BFDBFE] bg-[#EFF6FF] text-[#1D4ED8]"
@@ -266,14 +267,14 @@ export function ProductDemo() {
                   type="button"
                   key={item.name}
                   onClick={() => setSelectedLead(item.name)}
-                  className={`group flex w-full cursor-pointer items-center gap-3.5 border-b border-[#F0F0F0] px-4 py-3 text-left transition-all last:border-0 sm:gap-4 sm:px-5 sm:py-3.5 ${
+                  className={`group flex w-full cursor-pointer items-center gap-3.5 border-b border-[#F0F0F0] px-4 py-3 text-left transition-[background-color,box-shadow,transform,opacity] duration-300 ease-out last:border-0 sm:gap-4 sm:px-5 sm:py-3.5 ${
                     spotlight
-                      ? "bg-[#EFF6FF] ring-1 ring-inset ring-[#2563EB]/20 shadow-[inset_0_0_0_1px_rgba(37,99,235,0.08),0_10px_26px_-18px_rgba(37,99,235,0.52)]"
+                      ? "-translate-y-px bg-[#EFF6FF] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.08),0_14px_32px_-18px_rgba(37,99,235,0.48)] ring-1 ring-inset ring-[#2563EB]/20"
                       : rowSent
                         ? "bg-[#F8FAFC] opacity-85"
                       : isActive
                         ? "bg-[#EFF6FF]"
-                        : "bg-white hover:bg-[#FAFAFA]"
+                        : "bg-white can-hover:hover:bg-[#FAFAFA]"
                   }`}
                 >
                   <span
@@ -317,17 +318,17 @@ export function ProductDemo() {
 
         <div className="bg-gradient-to-b from-[#EEF4FC] to-[#EDF2F8] p-5 sm:p-6 lg:p-7">
           <div
-            className={`relative rounded-xl border border-[#BFDBFE]/80 bg-white p-5 ring-1 ring-[#2563EB]/14 transition-all duration-300 sm:p-6 ${
+            className={`relative rounded-xl border border-[#BFDBFE]/80 bg-white p-5 ring-1 ring-[#2563EB]/14 transition-[transform,box-shadow,filter,background-color] duration-[420ms] ease-out sm:p-6 ${
               panelFocus
-                ? "scale-[1.02] brightness-[1.01] shadow-[0_28px_60px_-22px_rgba(37,99,235,0.56)]"
+                ? "scale-[1.02] brightness-[1.02] shadow-[0_28px_60px_-22px_rgba(37,99,235,0.56)]"
                 : "shadow-[0_16px_36px_-20px_rgba(15,23,42,0.22)]"
             }`}
           >
             <div
-              className={`absolute right-4 top-3 z-20 flex items-center gap-2 rounded-full border border-[#BBF7D0] bg-white/95 px-3 py-1 text-[12px] font-medium text-[#15803D] shadow-[0_8px_20px_-14px_rgba(22,163,74,0.45)] transition-all duration-300 ${
+              className={`absolute right-4 top-3 z-20 flex items-center gap-2 rounded-full border border-[#BBF7D0] bg-white/95 px-3 py-1 text-[12px] font-medium text-[#15803D] shadow-[0_8px_20px_-14px_rgba(22,163,74,0.45)] transition-[transform,opacity] duration-[420ms] ease-out motion-reduce:transition-none ${
                 showToast
                   ? "translate-y-0 opacity-100"
-                  : "-translate-y-1 opacity-0 pointer-events-none"
+                  : "pointer-events-none translate-y-1.5 opacity-0"
               }`}
               aria-live="polite"
             >
@@ -350,7 +351,7 @@ export function ProductDemo() {
                 </p>
               </div>
               <span
-                className={`rounded-full border px-2.5 py-1 text-[12px] font-semibold transition-all duration-300 ${
+                className={`rounded-full border px-2.5 py-1 text-[12px] font-semibold transition-[background-color,border-color,color] duration-[400ms] ease-out ${
                   sent
                     ? "border-[#86EFAC] bg-[#DCFCE7] text-[#15803D]"
                     : "border-[#BBF7D0] bg-[#F0FDF4] text-[#16A34A]"
@@ -360,7 +361,7 @@ export function ProductDemo() {
               </span>
             </div>
             <div
-              className={`mt-5 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] p-4 transition-all duration-300 sm:p-5 ${
+              className={`mt-5 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] p-4 transition-[opacity,background-color] duration-[400ms] ease-out sm:p-5 ${
                 sent ? "opacity-75" : "opacity-100"
               }`}
             >
@@ -374,25 +375,27 @@ export function ProductDemo() {
                 type="button"
                 onClick={onApprove}
                 disabled={approveLoading || sent}
-                className={`inline-flex h-10 items-center rounded-xl bg-[#2563EB] px-4 text-[14px] font-semibold text-white transition-all duration-200 hover:bg-[#1D4ED8] ${
-                  approvePressed ? "scale-[0.96]" : "scale-100"
-                } ${
-                  approveGlow
-                    ? "shadow-[0_0_0_1px_rgba(37,99,235,0.25),0_0_0_8px_rgba(37,99,235,0.14),0_20px_36px_-20px_rgba(37,99,235,0.65)]"
-                    : ""
-                } disabled:cursor-not-allowed disabled:opacity-80`}
+                className={cn(
+                  "inline-flex h-10 items-center rounded-xl bg-[#2563EB] px-4 text-[14px] font-semibold text-white transition-[transform,box-shadow,background-color] duration-200 ease-out can-hover:hover:bg-[#1D4ED8]",
+                  approvePressed ? "scale-[0.96]" : "scale-100",
+                  approveGlow &&
+                    !approveLoading &&
+                    !sent &&
+                    "shadow-[0_0_0_1px_rgba(37,99,235,0.25),0_0_0_8px_rgba(37,99,235,0.14),0_20px_36px_-20px_rgba(37,99,235,0.65)] motion-safe:demo-approve-pulse",
+                  "disabled:cursor-not-allowed disabled:opacity-80",
+                )}
               >
                 {approveLoading ? "Sending..." : sent ? "Sent" : "Approve"}
               </button>
               <button
                 type="button"
-                className="inline-flex h-10 items-center rounded-xl border border-[#E5E7EB] bg-white px-4 text-[14px] font-semibold text-[#0A0A0A] transition-colors hover:border-[#BFDBFE] hover:bg-[#EFF6FF]"
+                className="inline-flex h-10 items-center rounded-xl border border-[#E5E7EB] bg-white px-4 text-[14px] font-semibold text-[#0A0A0A] transition-[border-color,background-color] duration-200 ease-out can-hover:hover:border-[#BFDBFE] can-hover:hover:bg-[#EFF6FF]"
               >
                 Edit
               </button>
               <button
                 type="button"
-                className="inline-flex h-10 items-center rounded-xl px-4 text-[14px] font-semibold text-[#64748B] transition-colors hover:text-[#0A0A0A]"
+                className="inline-flex h-10 items-center rounded-xl px-4 text-[14px] font-semibold text-[#64748B] transition-colors duration-200 ease-out can-hover:hover:text-[#0A0A0A]"
               >
                 Skip
               </button>
@@ -429,7 +432,7 @@ export function ProductDemo() {
                 clearTimers();
                 runDemo();
               }}
-              className="mt-2 text-[12px] font-medium text-[#2563EB]/80 transition-colors hover:text-[#1D4ED8]"
+              className="mt-2 text-[12px] font-medium text-[#2563EB]/80 transition-colors duration-200 ease-out can-hover:hover:text-[#1D4ED8]"
             >
               Replay demo
             </button>

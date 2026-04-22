@@ -16,14 +16,14 @@ export function FinalCta() {
             EARLY ACCESS
           </p>
           <h2 className="mt-4 text-balance text-[2rem] font-semibold leading-[1.12] tracking-tight text-[#0A0A0A] sm:text-[2.35rem] lg:text-[2.6rem]">
-            We&apos;re rolling this out to early founders.
+            Start with real conversations
           </h2>
         </FadeUp>
 
         <FadeUp delay={0.05} className="mt-7">
           <p className="text-pretty text-[17px] leading-relaxed text-[#374151] sm:text-lg">
-            If you built something and no one is using it yet — this is for
-            you.
+            If you&apos;re working on something and looking for early users,
+            Tractionflo gives you a more direct path.
           </p>
         </FadeUp>
 

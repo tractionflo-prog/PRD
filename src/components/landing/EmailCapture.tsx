@@ -168,7 +168,7 @@ export function EmailCapture() {
                   className="h-12 w-full text-[15px]"
                   disabled={status === "loading"}
                 >
-                  {status === "loading" ? "Joining…" : "Join early access"}
+                  {status === "loading" ? "Joining…" : "Get early access"}
                 </PrimaryButton>
               </form>
             )}

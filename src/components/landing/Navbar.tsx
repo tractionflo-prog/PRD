@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type MouseEvent, useEffect, useRef, useState } from "react";
@@ -32,6 +33,7 @@ export function Navbar() {
   const isHome = pathname === "/";
   const [pastHero, setPastHero] = useState(false);
   const ticking = useRef(false);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!isHome) {
@@ -70,17 +72,26 @@ export function Navbar() {
   const cinematic = isHome && !pastHero;
 
   return (
-    <header
+    <motion.header
+      initial={reduceMotion ? false : { opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: reduceMotion ? 0 : 0.64,
+        ease: [0.22, 1, 0.36, 1],
+      }}
       className={cn(
-        "top-0 z-50 w-full border-b pt-[env(safe-area-inset-top,0px)] transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300",
+        "top-0 z-50 w-full border-b pt-[env(safe-area-inset-top,0px)] transition-[background-color,backdrop-filter,border-color,box-shadow,padding] duration-300",
         isHome ? "fixed" : "sticky",
         cinematic
-          ? "border-white/5 bg-black/55 shadow-[0_8px_24px_-20px_rgba(0,0,0,0.75)] backdrop-blur-[10px]"
-          : "border-[#ECECEC] bg-white/90 shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur-md",
+          ? "border-white/5 bg-black/50 shadow-[0_10px_36px_-28px_rgba(0,0,0,0.78)] backdrop-blur-[12px]"
+          : "border-[#E2E8F0] bg-white/95 shadow-[0_8px_28px_-22px_rgba(15,23,42,0.1)] backdrop-blur-md",
       )}
     >
       <nav
-        className="mx-auto flex min-h-[3.25rem] w-full min-w-0 max-w-[1200px] flex-wrap items-center justify-between gap-x-2 gap-y-2 px-4 py-2 sm:h-14 sm:min-h-0 sm:gap-x-6 sm:gap-y-0 sm:px-8 sm:py-0"
+        className={cn(
+          "mx-auto flex min-h-[3.25rem] w-full min-w-0 max-w-[1200px] flex-wrap items-center justify-between gap-x-2 gap-y-2 px-4 transition-[padding,min-height] duration-300 sm:h-14 sm:min-h-0 sm:gap-x-6 sm:gap-y-0 sm:px-8 sm:py-0",
+          isHome && pastHero ? "py-1.5 sm:py-0" : "py-2 sm:py-0",
+        )}
         aria-label="Primary"
       >
         <Link
@@ -104,8 +115,8 @@ export function Navbar() {
                   className={cn(
                     "inline-flex min-h-11 items-center rounded-md px-1 text-[13px] font-medium transition-colors sm:px-0 sm:text-[15px]",
                     cinematic
-                      ? "text-white/85 hover:text-white focus-visible:outline-white/40"
-                      : "text-[#6B7280] hover:text-[#2563EB] focus-visible:outline-[#2563EB]/35",
+                      ? "text-white/85 can-hover:hover:text-white focus-visible:outline-white/40"
+                      : "text-[#6B7280] can-hover:hover:text-[#2563EB] focus-visible:outline-[#2563EB]/35",
                     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
                   )}
                 >
@@ -124,6 +135,6 @@ export function Navbar() {
           </ScrollCta>
         </div>
       </nav>
-    </header>
+    </motion.header>
   );
 }

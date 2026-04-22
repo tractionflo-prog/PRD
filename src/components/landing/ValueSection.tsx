@@ -7,19 +7,19 @@ const cards = [
   {
     n: "01",
     title: "Tell us what you built",
-    text: "One sentence is enough.",
+    text: "A short description is enough.",
     icon: IconDoc,
   },
   {
     n: "02",
-    title: "We find people already looking",
-    text: "Communities, conversations, real intent.",
+    title: "We surface relevant conversations",
+    text: "Across places where people are actively asking.",
     icon: IconUsers,
   },
   {
     n: "03",
-    title: "You approve the outreach",
-    text: "Nothing sends without you.",
+    title: "You choose when to engage",
+    text: "Nothing is sent without your approval.",
     icon: IconCheck,
   },
 ] as const;
@@ -32,11 +32,8 @@ export function ValueSection() {
     >
       <FadeUp>
         <h2 className="max-w-[40rem] text-balance text-[2rem] font-semibold leading-[1.12] tracking-tight text-[#0A0A0A] sm:text-[2.35rem] lg:text-[2.65rem]">
-          You build. We find users. You approve.
+          A simple way to connect with real demand
         </h2>
-        <p className="mt-5 max-w-[42rem] text-pretty text-[17px] font-normal leading-relaxed text-[#475569] sm:text-[1.08rem]">
-          No cold outreach. No guessing. No waiting months for feedback.
-        </p>
       </FadeUp>
 
       <div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-[#CBD5E1]/50 to-transparent" />
@@ -50,9 +47,9 @@ export function ValueSection() {
           const Icon = card.icon;
           const isFirst = i === 0;
           return (
-            <FadeUp key={card.n} delay={0.04 * i}>
+            <FadeUp key={card.n} delay={0.08 * i}>
               <SurfaceCard
-                className={`group relative z-[1] flex h-full flex-col overflow-hidden border-transparent p-0 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] ${
+                className={`group relative z-[1] flex h-full flex-col overflow-hidden border-transparent p-0 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-[transform,box-shadow] duration-200 ease-out can-hover:hover:-translate-y-1 can-hover:hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] ${
                   isFirst ? "bg-white" : "bg-[#F8FAFC]"
                 }`}
               >
