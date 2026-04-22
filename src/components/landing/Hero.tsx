@@ -16,7 +16,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 z-0 min-h-full w-full"
         aria-hidden
       >
-        <div className="relative h-full min-h-screen w-full min-w-0 supports-[min-height:100svh]:min-h-[100svh]">
+        <div className="relative flex h-full min-h-screen w-full min-w-0 items-center justify-center bg-[#0A0A0A] supports-[min-height:100svh]:min-h-[100svh]">
           <Image
             src="/hero.png"
             alt=""
@@ -24,7 +24,7 @@ export function Hero() {
             priority
             sizes="100vw"
             quality={85}
-            className="object-cover object-[center_22%] md:object-center"
+            className="object-contain object-center md:object-cover md:object-[center_22%] lg:object-center"
             decoding="async"
           />
         </div>
