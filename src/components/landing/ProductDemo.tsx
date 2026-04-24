@@ -1,12 +1,13 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import { useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type LeadItem = {
   name: string;
   preview: string;
-  source: "Reddit" | "X" | "Indie";
+  source: "Reddit";
   status: "New" | "Queued" | "Ready";
   unread?: boolean;
   avatarBg: string;
@@ -19,24 +20,34 @@ const leads: LeadItem[] = [
     source: "Reddit",
     status: "Ready",
     unread: true,
-    avatarBg: "bg-[#2563EB]",
+    avatarBg: "bg-[#635bff]",
   },
   {
     name: "Rina",
-    preview: "Posted in r/SaaS about CRM overload and no follow-up.",
-    source: "X",
+    preview: "Posted in r/SaaS — drowning in follow-ups after demos.",
+    source: "Reddit",
     status: "Queued",
     unread: true,
-    avatarBg: "bg-[#1D4ED8]",
+    avatarBg: "bg-[#5851ea]",
   },
   {
     name: "Alex",
-    preview: "DM’d about beta access for his startup ops team.",
-    source: "Indie",
+    preview: "Asked r/startups for a simple ops checklist — sounds stuck.",
+    source: "Reddit",
     status: "New",
     avatarBg: "bg-[#334155]",
   },
 ];
+
+/** Draft copy for the right-hand “chat” panel — loops type / delete until approved. */
+const MESSAGE_DRAFT_BY_LEAD: Record<string, string> = {
+  Marcus:
+    "Hey Marcus — saw your post in r/landlords. Built something for this. Happy to share if useful.",
+  Rina:
+    "Hey Rina — that pile of follow-ups after demos is brutal. How are you keeping threads from slipping this week?",
+  Alex:
+    "Hey Alex — saw your r/startups thread on ops checklists. Curious what has been the stickiest part day to day?",
+};
 
 function Dot({ live }: { live?: boolean }) {
   return (
@@ -57,7 +68,7 @@ function StatusPill({ status }: { status: LeadItem["status"] }) {
   }
   if (status === "Queued") {
     return (
-      <span className="rounded-full border border-[#BFDBFE] bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-semibold text-[#2563EB] transition-[background-color,border-color,color] duration-[400ms] ease-out">
+      <span className="rounded-full border border-[#e9d5ff] bg-[#f5f3ff] px-2 py-0.5 text-[11px] font-semibold text-[#635bff] transition-[background-color,border-color,color] duration-[400ms] ease-out">
         Queued
       </span>
     );
@@ -69,25 +80,113 @@ function StatusPill({ status }: { status: LeadItem["status"] }) {
   );
 }
 
-function SourceBadge({ source }: { source: LeadItem["source"] }) {
-  if (source === "Reddit") {
-    return (
-      <span className="rounded-full border border-[#FED7AA] bg-[#FFF7ED] px-2 py-0.5 text-[11px] font-semibold text-[#C2410C]">
-        Reddit
-      </span>
-    );
-  }
-  if (source === "X") {
-    return (
-      <span className="rounded-full border border-[#E5E7EB] bg-[#F9FAFB] px-2 py-0.5 text-[11px] font-semibold text-[#374151]">
-        X
-      </span>
-    );
-  }
+function SourceBadge() {
   return (
-    <span className="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-2 py-0.5 text-[11px] font-semibold text-[#475569]">
-      Indie
+    <span className="rounded-full border border-[#FED7AA] bg-[#FFF7ED] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#C2410C]">
+      Real conversations
     </span>
+  );
+}
+
+/**
+ * Instantly-style loop in the message bubble: type forward → brief pause →
+ * delete backward → brief pause → repeat. Runs on load so the chat area
+ * always shows motion until the draft is “frozen” (e.g. after Approve).
+ */
+function MessageDraftTypewriter({ text, frozen }: { text: string; frozen: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const [shown, setShown] = useState("");
+  const timeoutRef = useRef<number | null>(null);
+  const cancelledRef = useRef(false);
+
+  useEffect(() => {
+    cancelledRef.current = false;
+
+    const clearTimer = () => {
+      if (timeoutRef.current != null) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+
+    const schedule = (fn: () => void, ms: number) => {
+      clearTimer();
+      timeoutRef.current = window.setTimeout(() => {
+        timeoutRef.current = null;
+        if (!cancelledRef.current) fn();
+      }, ms);
+    };
+
+    if (reduceMotion || frozen) {
+      clearTimer();
+      setShown(text);
+      return () => {
+        cancelledRef.current = true;
+        clearTimer();
+      };
+    }
+
+    let len = 0;
+    let phase: "in" | "pauseFull" | "out" | "pauseEmpty" = "in";
+
+    const step = () => {
+      if (cancelledRef.current) return;
+
+      if (phase === "in") {
+        if (len < text.length) {
+          len += 1;
+          setShown(text.slice(0, len));
+          schedule(step, 36 + (len % 5) * 6);
+          return;
+        }
+        phase = "pauseFull";
+        schedule(() => {
+          phase = "out";
+          step();
+        }, 1500);
+        return;
+      }
+
+      if (phase === "out") {
+        if (len > 0) {
+          len -= 1;
+          setShown(text.slice(0, len));
+          schedule(step, 24 + (len % 4) * 4);
+          return;
+        }
+        phase = "pauseEmpty";
+        schedule(() => {
+          len = 0;
+          setShown("");
+          phase = "in";
+          step();
+        }, 950);
+      }
+    };
+
+    len = 0;
+    setShown("");
+    phase = "in";
+    schedule(step, 500);
+
+    return () => {
+      cancelledRef.current = true;
+      clearTimer();
+    };
+  }, [text, frozen, reduceMotion]);
+
+  const showCaret = !reduceMotion && !frozen;
+
+  return (
+    <p className="min-h-[4.5rem] text-[15px] leading-relaxed text-[#475569] sm:min-h-[5rem] sm:text-[16px]">
+      {shown}
+      {showCaret ? (
+        <span
+          className="ml-px inline-block h-[1.15em] w-[2px] translate-y-px animate-pulse bg-[#635bff]/55 align-middle motion-reduce:hidden"
+          aria-hidden
+        />
+      ) : null}
+    </p>
   );
 }
 
@@ -185,11 +284,16 @@ export function ProductDemo() {
     [selectedLead],
   );
 
+  const draftMessage = useMemo(
+    () => MESSAGE_DRAFT_BY_LEAD[activeLead.name] ?? MESSAGE_DRAFT_BY_LEAD["Marcus"],
+    [activeLead.name],
+  );
+
   const onApprove = () => triggerApprove();
 
   return (
     <>
-      <div className="flex items-center justify-between border-b border-[#E5E7EB] bg-white px-5 py-3.5 sm:px-6">
+      <div className="flex items-center justify-between border-b border-[#e2e8f0] bg-white px-5 py-3.5 sm:px-6">
         <div className="flex items-center gap-2">
           <Dot />
           <Dot />
@@ -202,19 +306,19 @@ export function ProductDemo() {
       </div>
 
       <div className="grid lg:min-h-[520px] lg:grid-cols-[minmax(0,250px)_minmax(0,1fr)_minmax(0,420px)]">
-        <aside className="hidden border-r border-[#E5E7EB] bg-white lg:block">
-          <div className="border-b border-[#F0F0F0] px-5 py-5">
+        <aside className="hidden border-r border-[#e2e8f0] bg-white lg:block">
+          <div className="border-b border-[#e2e8f0] px-5 py-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#64748B]">
               Workspace
             </p>
-            <p className="mt-2 text-[15px] font-semibold text-[#0A0A0A]">
+            <p className="mt-2 text-[15px] font-semibold text-[#0f172a]">
               My launch
             </p>
           </div>
           <nav className="p-3">
             {[
               { name: "Inbox", active: true, unread: 5 },
-              { name: "Leads", active: false, unread: 2 },
+              { name: "People likely facing this problem", active: false, unread: 2 },
               { name: "Sent", active: false, unread: 0 },
               { name: "Skipped", active: false, unread: 0 },
             ].map((item) => (
@@ -222,8 +326,8 @@ export function ProductDemo() {
                 key={item.name}
                 className={`mb-1 flex items-center justify-between rounded-xl px-3.5 py-2.5 text-[15px] transition-colors ${
                   item.active
-                    ? "bg-[#EFF6FF] font-semibold text-[#2563EB]"
-                    : "font-medium text-[#475569] can-hover:hover:bg-[#FAFAFA]"
+                    ? "bg-[rgba(99,91,255,0.08)] font-semibold text-[#635bff]"
+                    : "font-medium text-[#64748b] can-hover:hover:bg-[#fafafa]"
                 }`}
               >
                 <span>{item.name}</span>
@@ -231,8 +335,8 @@ export function ProductDemo() {
                   <span
                     className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold ${
                       item.active
-                        ? "bg-[#2563EB] text-white"
-                        : "bg-[#EEF2FF] text-[#4338CA]"
+                        ? "bg-[#635bff] text-white"
+                        : "bg-[#f5f3ff] text-[#635bff]"
                     }`}
                   >
                     {item.unread}
@@ -243,17 +347,19 @@ export function ProductDemo() {
           </nav>
         </aside>
 
-        <div className="border-b border-[#E5E7EB] bg-white lg:border-b-0 lg:border-r">
-          <div className="flex items-center justify-between border-b border-[#F0F0F0] px-5 py-3.5 sm:px-6">
-            <h3 className="text-[15px] font-semibold text-[#0A0A0A]">Leads</h3>
+        <div className="border-b border-[#e2e8f0] bg-white lg:border-b-0 lg:border-r">
+          <div className="flex items-center justify-between border-b border-[#e2e8f0] px-5 py-3.5 sm:px-6">
+            <h3 className="text-[15px] font-semibold text-[#0f172a]">
+              People likely facing this problem
+            </h3>
             <span
               className={`rounded-full border px-3 py-1 text-[12px] font-semibold transition-[background-color,border-color,color] duration-[400ms] ease-out ${
                 sent
-                  ? "border-[#93C5FD] bg-[#EFF6FF] text-[#1D4ED8]"
-                  : "border-[#BFDBFE] bg-[#EFF6FF] text-[#1D4ED8]"
+                  ? "border-[#ddd6fe] bg-[#f5f3ff] text-[#635bff]"
+                  : "border-[#e9d5ff] bg-[#faf5ff] text-[#635bff]"
               }`}
             >
-              {queueCount} queued
+              {queueCount} demand signals
             </span>
           </div>
           <div className="max-h-[min(52vh,360px)] overflow-y-auto lg:max-h-none">
@@ -267,19 +373,19 @@ export function ProductDemo() {
                   type="button"
                   key={item.name}
                   onClick={() => setSelectedLead(item.name)}
-                  className={`group flex w-full cursor-pointer items-center gap-3.5 border-b border-[#F0F0F0] px-4 py-3 text-left transition-[background-color,box-shadow,transform,opacity] duration-300 ease-out last:border-0 sm:gap-4 sm:px-5 sm:py-3.5 ${
+                  className={`group flex w-full cursor-pointer items-center gap-3.5 border-b border-[#f1f5f9] px-4 py-3 text-left transition-[background-color,box-shadow,transform,opacity] duration-300 ease-out last:border-0 sm:gap-4 sm:px-5 sm:py-3.5 ${
                     spotlight
-                      ? "-translate-y-px bg-[#EFF6FF] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.08),0_14px_32px_-18px_rgba(37,99,235,0.48)] ring-1 ring-inset ring-[#2563EB]/20"
+                      ? "-translate-y-px bg-[#faf5ff] shadow-[inset_0_0_0_1px_rgba(99,91,255,0.1),0_14px_32px_-18px_rgba(99,91,255,0.2)] ring-1 ring-inset ring-[#635bff]/15"
                       : rowSent
-                        ? "bg-[#F8FAFC] opacity-85"
+                        ? "bg-[#f8fafc] opacity-85"
                       : isActive
-                        ? "bg-[#EFF6FF]"
-                        : "bg-white can-hover:hover:bg-[#FAFAFA]"
+                        ? "bg-[#faf5ff]"
+                        : "bg-white can-hover:hover:bg-[#fafafa]"
                   }`}
                 >
                   <span
                     className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white ring-2 sm:h-10 sm:w-10 sm:text-xs ${
-                      isActive ? "ring-[#BFDBFE]" : "ring-[#F3F4F6]"
+                      isActive ? "ring-[#ddd6fe]" : "ring-[#f1f5f9]"
                     } ${item.avatarBg}`}
                   >
                     {item.name.slice(0, 1)}
@@ -289,10 +395,10 @@ export function ProductDemo() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <p className="truncate text-[14px] font-semibold text-[#0A0A0A] sm:text-[15px]">
+                      <p className="truncate text-[14px] font-semibold text-[#0f172a] sm:text-[15px]">
                         {item.name}
                       </p>
-                      <SourceBadge source={item.source} />
+                      <SourceBadge />
                     </div>
                     <p className="mt-0.5 line-clamp-2 break-words text-[13px] text-[#64748B] sm:truncate sm:text-[14px]">
                       {item.preview}
@@ -302,10 +408,10 @@ export function ProductDemo() {
                     <StatusPill status={item.status} />
                     {rowSent ? (
                       <span className="rounded-full border border-[#86EFAC] bg-[#DCFCE7] px-2.5 py-1 text-[11px] font-semibold text-[#15803D] sm:text-xs">
-                        Sent
+                        Approved
                       </span>
                     ) : isActive ? (
-                      <span className="rounded-full bg-[#2563EB] px-2.5 py-1 text-[11px] font-semibold text-white sm:text-xs">
+                      <span className="rounded-full bg-[#635bff] px-2.5 py-1 text-[11px] font-semibold text-white sm:text-xs">
                         Open
                       </span>
                     ) : null}
@@ -316,12 +422,12 @@ export function ProductDemo() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-b from-[#EEF4FC] to-[#EDF2F8] p-5 sm:p-6 lg:p-7">
+        <div className="bg-[#fafafa] p-5 sm:p-6 lg:p-7">
           <div
-            className={`relative rounded-xl border border-[#BFDBFE]/80 bg-white p-5 ring-1 ring-[#2563EB]/14 transition-[transform,box-shadow,filter,background-color] duration-[420ms] ease-out sm:p-6 ${
+            className={`relative rounded-xl border border-[#e2e8f0] bg-white p-5 ring-1 ring-[#635bff]/10 transition-[transform,box-shadow,filter,background-color] duration-[420ms] ease-out sm:p-6 ${
               panelFocus
-                ? "scale-[1.02] brightness-[1.02] shadow-[0_28px_60px_-22px_rgba(37,99,235,0.56)]"
-                : "shadow-[0_16px_36px_-20px_rgba(15,23,42,0.22)]"
+                ? "scale-[1.01] shadow-[0_24px_60px_-24px_rgba(99,91,255,0.18)]"
+                : "shadow-[0_16px_48px_-28px_rgba(15,23,42,0.08)]"
             }`}
           >
             <div
@@ -338,16 +444,16 @@ export function ProductDemo() {
                 }`}
                 aria-hidden
               />
-              Message approved
+              Starter ready
             </div>
 
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#2563EB]">
-                  Message
+                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#635bff]">
+                  Message draft
                 </p>
-                <p className="mt-1.5 text-[15px] font-semibold text-[#0A0A0A]">
-                  Draft for {activeLead.name}
+                <p className="mt-1.5 text-[15px] font-semibold text-[#0f172a]">
+                  For {activeLead.name}
                 </p>
               </div>
               <span
@@ -357,18 +463,15 @@ export function ProductDemo() {
                     : "border-[#BBF7D0] bg-[#F0FDF4] text-[#16A34A]"
                 }`}
               >
-                {sent ? "Sent" : "Ready"}
+                {sent ? "Approved" : "Ready"}
               </span>
             </div>
             <div
-              className={`mt-5 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] p-4 transition-[opacity,background-color] duration-[400ms] ease-out sm:p-5 ${
+              className={`mt-5 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4 transition-[opacity,background-color] duration-[400ms] ease-out sm:p-5 ${
                 sent ? "opacity-75" : "opacity-100"
               }`}
             >
-              <p className="text-[15px] leading-relaxed text-[#334155] sm:text-[16px]">
-                Hey Marcus — saw your post in r/landlords. Built something for
-                this. Happy to share if useful.
-              </p>
+              <MessageDraftTypewriter text={draftMessage} frozen={sent} />
             </div>
             <div className="mt-5 flex flex-wrap gap-2.5">
               <button
@@ -376,37 +479,37 @@ export function ProductDemo() {
                 onClick={onApprove}
                 disabled={approveLoading || sent}
                 className={cn(
-                  "inline-flex h-10 items-center rounded-xl bg-[#2563EB] px-4 text-[14px] font-semibold text-white transition-[transform,box-shadow,background-color] duration-200 ease-out can-hover:hover:bg-[#1D4ED8]",
+                  "inline-flex h-10 items-center rounded-xl bg-[#635bff] px-4 text-[14px] font-semibold text-white transition-[transform,box-shadow,background-color] duration-200 ease-out can-hover:hover:bg-[#5851ea]",
                   approvePressed ? "scale-[0.96]" : "scale-100",
                   approveGlow &&
                     !approveLoading &&
                     !sent &&
-                    "shadow-[0_0_0_1px_rgba(37,99,235,0.25),0_0_0_8px_rgba(37,99,235,0.14),0_20px_36px_-20px_rgba(37,99,235,0.65)] motion-safe:demo-approve-pulse",
+                    "shadow-[0_0_0_1px_rgba(99,91,255,0.25),0_0_0_8px_rgba(99,91,255,0.12),0_20px_36px_-20px_rgba(99,91,255,0.35)] motion-safe:demo-approve-pulse",
                   "disabled:cursor-not-allowed disabled:opacity-80",
                 )}
               >
-                {approveLoading ? "Sending..." : sent ? "Sent" : "Approve"}
+                {approveLoading ? "Saving…" : sent ? "Approved" : "Approve"}
               </button>
               <button
                 type="button"
-                className="inline-flex h-10 items-center rounded-xl border border-[#E5E7EB] bg-white px-4 text-[14px] font-semibold text-[#0A0A0A] transition-[border-color,background-color] duration-200 ease-out can-hover:hover:border-[#BFDBFE] can-hover:hover:bg-[#EFF6FF]"
+                className="inline-flex h-10 items-center rounded-xl border border-[#e2e8f0] bg-white px-4 text-[14px] font-semibold text-[#0f172a] transition-[border-color,background-color] duration-200 ease-out can-hover:hover:border-[#e9d5ff] can-hover:hover:bg-[#faf5ff]"
               >
                 Edit
               </button>
               <button
                 type="button"
-                className="inline-flex h-10 items-center rounded-xl px-4 text-[14px] font-semibold text-[#64748B] transition-colors duration-200 ease-out can-hover:hover:text-[#0A0A0A]"
+                className="inline-flex h-10 items-center rounded-xl px-4 text-[14px] font-semibold text-[#64748b] transition-colors duration-200 ease-out can-hover:hover:text-[#0f172a]"
               >
                 Skip
               </button>
             </div>
             <p className="mt-4 text-[13px] font-medium text-[#64748B]">
-              Nothing sends without you.
+              Nothing sends from Tractionflo — you copy, edit, and send yourself.
             </p>
 
             {/* Optional subtle cursor indicator for demo guidance */}
             <span
-              className={`pointer-events-none absolute left-[4.7rem] top-[16.45rem] h-2.5 w-2.5 rounded-full bg-white ring-2 ring-[#2563EB]/65 transition-all duration-300 ${
+              className={`pointer-events-none absolute left-[4.7rem] top-[16.45rem] h-2.5 w-2.5 rounded-full bg-white ring-2 ring-[#635bff]/55 transition-all duration-300 ${
                 approveGlow ? "opacity-90" : "opacity-0"
               }`}
               aria-hidden
@@ -424,7 +527,7 @@ export function ProductDemo() {
               >
                 ✓
               </span>
-              Message sent.
+              Draft saved — copy and send from your own account.
             </div>
             <button
               type="button"
@@ -432,7 +535,7 @@ export function ProductDemo() {
                 clearTimers();
                 runDemo();
               }}
-              className="mt-2 text-[12px] font-medium text-[#2563EB]/80 transition-colors duration-200 ease-out can-hover:hover:text-[#1D4ED8]"
+              className="mt-2 text-[12px] font-medium text-[#635bff]/85 transition-colors duration-200 ease-out can-hover:hover:text-[#5851ea]"
             >
               Replay demo
             </button>

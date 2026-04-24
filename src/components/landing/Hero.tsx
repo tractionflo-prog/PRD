@@ -1,70 +1,59 @@
 import { FadeUp } from "./FadeUp";
-import { HeroBackdrop } from "./HeroBackdrop";
-import { ScrollCta } from "./ScrollCta";
-
-const OVERLAY =
-  "linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0.05) 100%)";
+import { HeroDemandPreview } from "./HeroDemandPreview";
 
 export function Hero() {
   return (
     <section
       id="overview"
-      className="relative isolate flex min-h-screen w-full min-w-0 flex-col overflow-hidden bg-[#0A0A0A] scroll-mt-32 supports-[min-height:100svh]:min-h-[100svh] sm:scroll-mt-24"
+      className="relative isolate w-full min-w-0 scroll-mt-32 overflow-x-clip overflow-hidden bg-white pb-12 pt-[calc(env(safe-area-inset-top,0px)+4.25rem)] max-md:pb-14 sm:scroll-mt-24 sm:pb-24 sm:pt-[calc(env(safe-area-inset-top,0px)+4.5rem)] md:pb-28 md:pt-24"
     >
-      <div
-        className="pointer-events-none absolute inset-0 z-0 min-h-full w-full"
-        aria-hidden
-      >
-        <HeroBackdrop />
-        <div
-          className="absolute inset-0 z-[1] min-h-full w-full"
-          style={{ background: OVERLAY }}
-        />
+      <div className="hero-gradient-animated absolute inset-0 min-h-full" aria-hidden />
+      <div className="hero-ribbons" aria-hidden>
+        <div className="hero-ribbon hero-ribbon-1" />
+        <div className="hero-ribbon hero-ribbon-2" />
+        <div className="hero-ribbon hero-ribbon-3" />
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full min-w-0 max-w-[1200px] flex-1 flex-col justify-start px-5 pb-[max(5rem,env(safe-area-inset-bottom,0px))] pt-[calc(env(safe-area-inset-top,0px)+8.25rem)] max-md:pb-12 sm:px-8 md:justify-center md:px-10 md:pb-28 md:pt-[calc(3.75rem+env(safe-area-inset-top,0px)+1.75rem)] lg:pb-32 lg:pt-24">
-        <div className="max-w-[min(100%,36rem)] min-w-0 text-left md:max-w-[600px]">
+      <div className="relative z-[1] mx-auto w-full min-w-0 max-w-[1200px] px-5 py-8 sm:px-8 sm:py-16 md:py-20 lg:px-10">
+        <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center md:max-w-[44rem] md:items-start md:text-left">
           <FadeUp preset="hero">
-            <h1 className="mt-1 max-w-[36rem] text-balance text-[2.125rem] font-semibold leading-[1.08] tracking-tight text-white [text-shadow:0_10px_30px_rgba(0,0,0,0.6)] sm:mt-2 sm:text-[2.5rem] sm:leading-[1.06] lg:text-[3.1rem] lg:leading-[1.05]">
-              Find the people already looking for what you built
+            <p className="inline-flex items-center gap-2 rounded-full border border-[#e2e8f0] bg-white/90 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#64748b] shadow-[0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-sm sm:text-[12px] md:self-start">
+              Demand → conversations
+            </p>
+          </FadeUp>
+
+          <FadeUp preset="hero" delay={0.05} className="mt-4 sm:mt-7 md:mt-6">
+            <h1 className="text-balance text-[1.85rem] font-bold leading-[1.06] tracking-tight text-[#0f172a] max-md:max-w-[20ch] sm:text-[2.5rem] sm:leading-[1.06] md:max-w-none md:text-[2.85rem] md:leading-[1.04]">
+              <span className="md:hidden">Launch where people already care</span>
+              <span className="hidden md:inline">Stop launching into silence</span>
             </h1>
           </FadeUp>
 
-          <FadeUp preset="hero" delay={0.12} className="mt-5 sm:mt-6">
-            <p className="max-w-[34rem] text-pretty text-[16px] font-medium leading-snug text-white/90 [text-shadow:0_10px_30px_rgba(0,0,0,0.6)] sm:text-[1.24rem]">
-              <span className="block">
-                Most products don&apos;t fail because they&apos;re bad —
+          <FadeUp preset="hero" delay={0.1} className="mt-3 max-w-2xl sm:mt-6 md:mt-5">
+            <p className="text-pretty text-[14px] leading-snug text-[#64748b] max-md:max-w-[28ch] sm:text-[17px] sm:leading-relaxed md:mx-0 md:max-w-[38rem]">
+              <span className="md:hidden">
+                Spot real demand in conversations—or start sharper ones when it&apos;s quiet.
               </span>
-              <span className="mt-1 block">
-                they fail because the right people never see them.
+              <span className="hidden md:inline">
+                Find people already talking about the problem you solve — or start the right
+                conversations when demand isn&apos;t visible.
               </span>
             </p>
-            <div className="mt-4 max-w-[34rem] text-pretty text-[15px] leading-relaxed text-white/70 [text-shadow:0_10px_30px_rgba(0,0,0,0.6)] sm:mt-5 sm:text-[17px]">
-              <span className="block">
-                Tractionflo surfaces real conversations where your product is
-                already relevant,
-              </span>
-              <span className="mt-1 block">
-                so you can respond at the right moment.
-              </span>
-            </div>
           </FadeUp>
 
-          <FadeUp
-            preset="hero"
-            delay={0.24}
-            className="mt-12 flex flex-col gap-3 sm:mt-14"
-          >
-            <div className="w-full max-w-full rounded-full shadow-[0_10px_30px_rgba(59,130,246,0.35)] transition-[transform,box-shadow] duration-200 ease-out can-hover:hover:-translate-y-0.5 can-hover:hover:shadow-[0_14px_40px_rgba(59,130,246,0.45)] sm:w-fit">
-              <ScrollCta
-                href="/#join"
-                className="h-[52px] w-full max-w-full min-w-0 rounded-full !shadow-none px-[22px] text-[15px] font-semibold transition-colors duration-200 can-hover:hover:bg-[#1D4ED8] sm:min-w-[12rem] sm:px-8"
-              >
-                Get early access
-              </ScrollCta>
-            </div>
-            <p className="max-w-[28rem] text-[13px] leading-snug text-white/60 [text-shadow:0_10px_30px_rgba(0,0,0,0.6)] sm:text-[14px]">
-              For founders validating ideas and looking for their first users
+          <FadeUp preset="hero" delay={0.14} className="mt-4 hidden sm:mt-7 md:mt-6 md:block">
+            <p className="text-[13px] font-medium text-[#64748b] sm:text-[14px]">
+              Describe the problem, not just the product.
+            </p>
+          </FadeUp>
+
+          <FadeUp preset="hero" delay={0.18} className="mt-5 w-full max-w-2xl sm:mt-10 md:mt-8 md:self-start">
+            <HeroDemandPreview />
+          </FadeUp>
+
+          <FadeUp preset="hero" delay={0.22} className="mt-4 hidden max-w-2xl md:mt-5 md:block">
+            <p className="text-center text-[12px] font-medium leading-relaxed text-[#94a3b8] sm:text-[13px] md:text-left">
+              No spam • Nothing sends automatically • You stay in control
             </p>
           </FadeUp>
         </div>

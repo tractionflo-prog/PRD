@@ -7,19 +7,19 @@ const cards = [
   {
     n: "01",
     title: "Tell us what you built",
-    text: "A short description is enough.",
+    text: "Describe your product, website, or the problem you solve.",
     icon: IconDoc,
   },
   {
     n: "02",
-    title: "We surface relevant conversations",
-    text: "Across places where people are actively asking.",
+    title: "We find demand signals",
+    text: "We surface real conversations when people are already asking — and show people likely facing the problem when demand is quiet.",
     icon: IconUsers,
   },
   {
     n: "03",
-    title: "You choose when to engage",
-    text: "Nothing is sent without your approval.",
+    title: "You start the conversation",
+    text: "We draft thoughtful conversation starters. You approve, edit, and send manually.",
     icon: IconCheck,
   },
 ] as const;
@@ -28,52 +28,35 @@ export function ValueSection() {
   return (
     <Section
       id="process"
-      className="scroll-mt-24 bg-[#F9FBFD] py-20 sm:scroll-mt-20 sm:py-24 md:py-28 lg:py-32"
+      className="scroll-mt-24 bg-white py-20 sm:scroll-mt-20 sm:py-24 md:py-28 lg:py-32"
     >
       <FadeUp>
-        <h2 className="max-w-[40rem] text-balance text-[2rem] font-semibold leading-[1.12] tracking-tight text-[#0A0A0A] sm:text-[2.35rem] lg:text-[2.65rem]">
-          A simple way to connect with real demand
+        <h2 className="max-w-[40rem] text-balance text-[2rem] font-semibold leading-[1.12] tracking-tight text-[#0f172a] sm:text-[2.35rem] lg:text-[2.65rem]">
+          You find conversations — or you create them
         </h2>
       </FadeUp>
 
-      <div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-[#CBD5E1]/50 to-transparent" />
+      <div className="mt-8 h-px w-full max-w-[40rem] bg-[#e2e8f0]" />
 
-      <div className="relative mt-6 grid gap-6 sm:grid-cols-3 sm:gap-7">
-        <div
-          className="pointer-events-none absolute left-[16%] right-[16%] top-12 hidden h-px bg-gradient-to-r from-[#BFDBFE]/0 via-[#93C5FD]/55 to-[#BFDBFE]/0 lg:block"
-          aria-hidden
-        />
+      <div className="relative mt-10 grid gap-6 sm:grid-cols-3 sm:gap-7">
         {cards.map((card, i) => {
           const Icon = card.icon;
-          const isFirst = i === 0;
           return (
             <FadeUp key={card.n} delay={0.08 * i}>
-              <SurfaceCard
-                className={`group relative z-[1] flex h-full flex-col overflow-hidden border-transparent p-0 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-[transform,box-shadow] duration-200 ease-out can-hover:hover:-translate-y-1 can-hover:hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] ${
-                  isFirst ? "bg-white" : "bg-[#F8FAFC]"
-                }`}
-              >
-                <div
-                  className={`px-10 pb-8 pt-10 sm:px-11 sm:pb-9 sm:pt-11 ${
-                    isFirst
-                      ? "bg-gradient-to-br from-[#EFF6FF] via-[#F8FBFF] to-white"
-                      : "bg-gradient-to-br from-[#F3F7FC] via-[#F8FAFC] to-[#F8FAFC]"
-                  }`}
-                >
+              <SurfaceCard className="group relative z-[1] flex h-full flex-col overflow-hidden border-[#e2e8f0] p-0 shadow-[0_24px_80px_-48px_rgba(15,23,42,0.12)] transition-[transform,box-shadow] duration-200 ease-out can-hover:hover:-translate-y-0.5 can-hover:hover:shadow-[0_28px_90px_-44px_rgba(15,23,42,0.14)]">
+                <div className="px-8 pb-9 pt-9 sm:px-9 sm:pb-10 sm:pt-10">
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-[rgba(59,130,246,0.08)] text-[#2563EB] shadow-[0_6px_20px_rgba(59,130,246,0.15)]">
-                      <Icon className="h-9 w-9" />
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[rgba(99,91,255,0.08)] text-[#635bff] ring-1 ring-[#635bff]/10">
+                      <Icon className="h-8 w-8" />
                     </div>
-                    <span className="pt-1 text-[12px] font-medium tabular-nums tracking-[0.12em] text-[#64748B]/45">
+                    <span className="pt-1 text-[12px] font-medium tabular-nums tracking-[0.12em] text-[#94a3b8]">
                       {card.n}
                     </span>
                   </div>
-                </div>
-                <div className="px-10 pb-11 pt-8 sm:px-11 sm:pb-12">
-                  <h3 className="text-[1.18rem] font-bold leading-snug tracking-tight text-[#0A0A0A] sm:text-[1.24rem]">
+                  <h3 className="mt-8 text-[1.125rem] font-semibold leading-snug tracking-tight text-[#0f172a] sm:text-[1.2rem]">
                     {card.title}
                   </h3>
-                  <p className="mt-2.5 text-[16px] leading-relaxed text-[#475569]/80">
+                  <p className="mt-2.5 text-[15px] leading-relaxed text-[#64748b] sm:text-[16px]">
                     {card.text}
                   </p>
                 </div>

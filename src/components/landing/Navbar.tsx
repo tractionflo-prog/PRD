@@ -5,14 +5,14 @@ import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type MouseEvent, useEffect, useRef, useState } from "react";
+import { IconRadar, IconSend, IconTrend } from "./icons";
 import { ScrollCta } from "./ScrollCta";
 
 const BRAND = "Tractionflo";
 
 const links = [
-  { label: "Overview", hash: "overview" },
-  { label: "Process", hash: "process" },
-  { label: "Join", hash: "join" },
+  { label: "Overview", hash: "overview", Icon: IconRadar },
+  { label: "Process", hash: "process", Icon: IconTrend },
 ] as const;
 
 /** Hero bottom above this (px) ⇒ solid nav. Slightly above actual bar height for iOS scroll quirks. */
@@ -31,6 +31,7 @@ function smoothHashNav(e: MouseEvent<HTMLAnchorElement>, hash: string) {
 export function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const isDemand = pathname === "/demand";
   const [pastHero, setPastHero] = useState(false);
   const ticking = useRef(false);
   const reduceMotion = useReducedMotion();
@@ -69,7 +70,7 @@ export function Navbar() {
     };
   }, [isHome]);
 
-  const cinematic = isHome && !pastHero;
+  const darkNav = isDemand;
 
   return (
     <motion.header
@@ -82,9 +83,9 @@ export function Navbar() {
       className={cn(
         "top-0 z-50 w-full border-b pt-[env(safe-area-inset-top,0px)] transition-[background-color,backdrop-filter,border-color,box-shadow,padding] duration-300",
         isHome ? "fixed" : "sticky",
-        cinematic
+        darkNav
           ? "border-white/5 bg-black/50 shadow-[0_10px_36px_-28px_rgba(0,0,0,0.78)] backdrop-blur-[12px]"
-          : "border-[#E2E8F0] bg-white/95 shadow-[0_8px_28px_-22px_rgba(15,23,42,0.1)] backdrop-blur-md",
+          : "border-[#e2e8f0] bg-white/80 shadow-[0_8px_30px_-24px_rgba(15,23,42,0.06)] backdrop-blur-xl",
       )}
     >
       <nav
@@ -95,11 +96,11 @@ export function Navbar() {
         aria-label="Primary"
       >
         <Link
-          href="/#overview"
-          onClick={(e) => smoothHashNav(e, "overview")}
+          href={isDemand ? "/" : "/#overview"}
+          onClick={isDemand ? undefined : (e) => smoothHashNav(e, "overview")}
           className={cn(
             "min-h-11 min-w-11 shrink-0 py-2 text-[15px] font-semibold tracking-[-0.02em] sm:text-[16px]",
-            cinematic ? "text-white" : "text-[#0A0A0A]",
+            darkNav ? "text-white" : "text-[#0f172a]",
           )}
         >
           {BRAND}
@@ -107,31 +108,56 @@ export function Navbar() {
 
         <div className="flex min-w-0 max-w-full flex-1 basis-[min(100%,18rem)] items-center justify-end gap-2 sm:basis-auto sm:gap-8">
           <ul className="flex min-w-0 max-w-full flex-1 items-center justify-end gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-none sm:gap-8 [&::-webkit-scrollbar]:hidden">
-            {links.map((link) => (
-              <li key={link.hash} className="shrink-0">
-                <Link
-                  href={`/#${link.hash}`}
-                  onClick={(e) => smoothHashNav(e, link.hash)}
-                  className={cn(
-                    "inline-flex min-h-11 items-center rounded-md px-1 text-[13px] font-medium transition-colors sm:px-0 sm:text-[15px]",
-                    cinematic
-                      ? "text-white/85 can-hover:hover:text-white focus-visible:outline-white/40"
-                      : "text-[#6B7280] can-hover:hover:text-[#2563EB] focus-visible:outline-[#2563EB]/35",
-                    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-                  )}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+            {links.map((link) => {
+              const Icon = link.Icon;
+              return (
+                <li key={link.hash} className="shrink-0">
+                  <Link
+                    href={`/#${link.hash}`}
+                    onClick={(e) => smoothHashNav(e, link.hash)}
+                    className={cn(
+                      "group inline-flex min-h-11 items-center gap-2 rounded-md px-1 text-[13px] font-medium transition-colors sm:px-0 sm:text-[15px]",
+                      darkNav
+                        ? "text-white/85 can-hover:hover:text-white focus-visible:outline-white/40"
+                        : "text-[#64748b] can-hover:hover:text-[#635bff] focus-visible:outline-[#635bff]/35",
+                      "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        "size-[18px] shrink-0 text-[#635bff] transition-colors motion-reduce:transition-none",
+                        darkNav &&
+                          "text-[#c4b5fd] group-hover:text-[#e9d5ff]",
+                        !darkNav && "group-hover:text-[#5851ea]",
+                      )}
+                      width={18}
+                      height={18}
+                    />
+                    <span>{link.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
           <ScrollCta
             href="/#join"
-            className="h-11 max-w-full shrink-0 px-3 text-[13px] sm:h-10 sm:px-6 sm:text-[15px]"
-            variant="primary"
-            aria-label="Get early access — go to signup form"
+            className={cn(
+              "inline-flex h-11 max-w-full shrink-0 items-center gap-2 px-3 text-[13px] sm:h-10 sm:px-6 sm:text-[15px]",
+              isDemand && "ring-1 ring-white/20",
+            )}
+            variant={darkNav ? "subtle" : "primary"}
+            aria-label="Join waitlist — scroll to email form at bottom"
           >
-            Get early access
+            <IconSend
+              className={cn(
+                "size-[18px] shrink-0 transition-colors",
+                darkNav ? "text-[#635bff]" : "text-white",
+              )}
+              width={18}
+              height={18}
+              aria-hidden
+            />
+            <span className="truncate">Join early access</span>
           </ScrollCta>
         </div>
       </nav>

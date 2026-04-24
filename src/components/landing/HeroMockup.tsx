@@ -8,7 +8,7 @@ type LeadRow = {
   name: string;
   initials: string;
   body: string;
-  source: "Reddit" | "X" | "Indie Hackers";
+  subreddit: string;
   time: string;
   status: "New" | "Queued" | "Ready";
   active?: boolean;
@@ -21,7 +21,7 @@ const leads: LeadRow[] = [
     name: "Marcus",
     initials: "MA",
     body: "Looking for a tool to manage tenants before next month...",
-    source: "Reddit",
+    subreddit: "r/landlords",
     time: "2m ago",
     status: "New",
     active: true,
@@ -31,18 +31,18 @@ const leads: LeadRow[] = [
   {
     name: "Nora",
     initials: "NO",
-    body: "Manually following up with 80+ leads is burning us out.",
-    source: "X",
+    body: "Any recommendations for tracking rent payments without spreadsheets?",
+    subreddit: "r/realestateinvesting",
     time: "9m ago",
     status: "Queued",
     avatarClass: "bg-[#7C3AED]",
-    ringClass: "ring-[#DDD6FE]",
+    ringClass: "ring-[#F3D6C0]",
   },
   {
     name: "Ibrahim",
     initials: "IB",
-    body: "Need something simple for lead follow-up in our tiny team.",
-    source: "Indie Hackers",
+    body: "Struggling with tenant communication — what do you use?",
+    subreddit: "r/PropertyManagement",
     time: "14m ago",
     status: "Ready",
     avatarClass: "bg-[#2563EB]",
@@ -57,7 +57,7 @@ function Avatar({
   showOnline,
 }: {
   label: string;
-  className?: string;
+  className: string;
   ringClass?: string;
   showOnline?: boolean;
 }) {
@@ -83,7 +83,7 @@ function StatusChip({ status }: { status: LeadRow["status"] }) {
   if (status === "Ready") {
     return (
       <span className="rounded-full border border-[#BBF7D0] bg-[#F0FDF4] px-2 py-0.5 text-[10px] font-semibold text-[#16A34A]">
-        Ready
+        Approved
       </span>
     );
   }
@@ -94,25 +94,23 @@ function StatusChip({ status }: { status: LeadRow["status"] }) {
       </span>
     );
   }
-  return (
-    <span className="rounded-full border border-[#EDE9FE] bg-[#F5F3FF] px-2 py-0.5 text-[10px] font-semibold text-[#7C3AED]">
-      Queued
-    </span>
-  );
+  if (status === "Queued") {
+    return (
+      <span className="rounded-full border border-[#F3D6C0] bg-[#FFF7ED] px-2 py-0.5 text-[10px] font-semibold text-[#C2410C]">
+        Queued
+      </span>
+    );
+  }
+  return null;
 }
 
-function SourceBadge({ source }: { source: LeadRow["source"] }) {
-  const colors: Record<LeadRow["source"], string> = {
-    Reddit: "border-[#F3D6C0] bg-[#FFF7ED] text-[#C2410C]",
-    X: "border-[#E5E7EB] bg-[#F9FAFB] text-[#374151]",
-    "Indie Hackers": "border-[#DDD6FE] bg-[#F5F3FF] text-[#6D28D9]",
-  };
-
+function RedditBadge({ subreddit }: { subreddit: string }) {
   return (
     <span
-      className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${colors[source]}`}
+      className="rounded-full border border-[#F3D6C0] bg-[#FFF7ED] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#C2410C]"
+      title={subreddit}
     >
-      {source}
+      Real conversations
     </span>
   );
 }
@@ -120,11 +118,11 @@ function SourceBadge({ source }: { source: LeadRow["source"] }) {
 function MockChrome() {
   return (
     <div className="flex items-center justify-between border-b border-[#ECECEC] bg-white px-5 py-3 sm:px-6">
-      <span className="rounded-full bg-[#F5F3FF] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7C3AED]">
+      <span className="rounded-full bg-[#FFF7ED] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#C2410C]">
         Inbox
       </span>
       <div className="flex items-center gap-2" aria-hidden>
-        <span className="rounded-full border border-[#EDE9FE] bg-[#F5F3FF] px-2 py-0.5 text-[10px] font-medium text-[#7C3AED] sm:px-2.5 sm:text-[11px]">
+        <span className="rounded-full border border-[#F3D6C0] bg-[#FFF7ED] px-2 py-0.5 text-[10px] font-medium text-[#C2410C] sm:px-2.5 sm:text-[11px]">
           Tractionflo
         </span>
         <div className="flex items-center gap-1">
@@ -159,7 +157,7 @@ function LeadCard({ lead }: { lead: LeadRow }) {
             <p className="text-[13px] font-semibold text-[#0A0A0A]">
               {lead.name}
             </p>
-            <SourceBadge source={lead.source} />
+            <RedditBadge subreddit={lead.subreddit} />
             <StatusChip status={lead.status} />
           </div>
           <time className="mt-1 block text-[12px] tabular-nums text-[#9CA3AF]">
@@ -177,10 +175,10 @@ function MockBody() {
     <>
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#ECECEC] bg-white px-5 py-4 sm:px-6 sm:py-5">
         <h2 className="text-lg font-semibold tracking-tight text-[#0A0A0A] sm:text-xl">
-          5 users ready today
+          People to talk to
         </h2>
         <span className="rounded-full border border-[#BFDBFE] bg-[#EFF6FF] px-2.5 py-1 text-[12px] font-semibold text-[#2563EB]">
-          Queued
+          Demand signals
         </span>
       </div>
 
@@ -198,7 +196,7 @@ function MockBody() {
                 ringClass="ring-[#BFDBFE]"
               />
               <span className="text-[13px] font-semibold text-[#0A0A0A]">
-                Message draft
+                Conversation starter
               </span>
               <StatusChip status="Ready" />
             </div>
@@ -221,7 +219,7 @@ function MockBody() {
           type="button"
           className="inline-flex h-10 items-center justify-center rounded-lg bg-[#2563EB] px-4 text-[14px] font-medium text-white shadow-sm transition-colors hover:bg-[#1D4ED8]"
         >
-          Approve
+          Approved
         </button>
         <button
           type="button"
@@ -233,7 +231,7 @@ function MockBody() {
           type="button"
           className="inline-flex h-10 items-center justify-center rounded-lg px-4 text-[14px] font-medium text-[#6B7280] transition-colors hover:text-[#0A0A0A]"
         >
-          Skip
+          Skipped
         </button>
       </div>
     </>
@@ -253,7 +251,7 @@ export function HeroMockup() {
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -left-1 bottom-10 hidden h-24 w-40 rounded-xl border border-[#EDE9FE] bg-[#F5F3FF]/80 shadow-sm blur-[0.2px] sm:block lg:-left-3"
+        className="pointer-events-none absolute -left-1 bottom-10 hidden h-24 w-40 rounded-xl border border-[#F3D6C0] bg-[#FFF7ED]/80 shadow-sm blur-[0.2px] sm:block lg:-left-3"
         aria-hidden
       />
 

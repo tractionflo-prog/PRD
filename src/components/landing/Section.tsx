@@ -21,7 +21,7 @@ export function Section({
       id={id}
       className={cn(
         "relative px-5 sm:px-8 lg:px-10",
-        tone === "muted" && "bg-[#FAFAFA]",
+        tone === "muted" && "bg-[#f8fafc]",
         className,
       )}
     >

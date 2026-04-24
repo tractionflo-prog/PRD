@@ -92,16 +92,16 @@ export function EmailCapture() {
   return (
     <Section
       id="join"
-      className="scroll-mt-24 bg-[#F8FAFD] pb-24 pt-16 sm:scroll-mt-20 sm:pb-28 sm:pt-20 md:pb-32 md:pt-24"
+      className="scroll-mt-24 border-t border-[#e2e8f0] bg-[#f8fafc] pb-24 pt-16 sm:scroll-mt-20 sm:pb-28 sm:pt-20 md:pb-32 md:pt-24"
     >
       <FadeUp>
-        <SurfaceCard className="relative mx-auto max-w-lg overflow-hidden border-transparent bg-white shadow-[0_16px_36px_-24px_rgba(15,23,42,0.25)] ring-1 ring-[#E5E7EB]/70">
-          <div className="absolute left-0 top-0 h-full w-1 bg-[#2563EB]" aria-hidden />
+        <SurfaceCard className="relative mx-auto max-w-lg overflow-hidden border-[#e2e8f0] bg-white shadow-[0_24px_80px_-40px_rgba(15,23,42,0.12)]">
+          <div className="absolute left-0 top-0 h-full w-1 bg-[#635bff]" aria-hidden />
           <div className="p-8 sm:p-10 sm:pl-11">
-            <h2 className="text-2xl font-semibold tracking-tight text-[#0A0A0A] sm:text-[1.75rem]">
-              Get early access
+            <h2 className="text-2xl font-semibold tracking-tight text-[#0f172a] sm:text-[1.75rem]">
+              Join early access
             </h2>
-            <p className="mt-3 text-[15px] leading-relaxed text-[#6B7280]">
+            <p className="mt-3 text-[15px] leading-relaxed text-[#64748b]">
               We’ll notify you when it’s ready and send an early invite.
             </p>
 
@@ -118,7 +118,7 @@ export function EmailCapture() {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-[15px] font-medium text-[#0A0A0A]"
+                    className="block text-[15px] font-medium text-[#0f172a]"
                   >
                     Email address
                   </label>
@@ -129,13 +129,13 @@ export function EmailCapture() {
                     autoComplete="email"
                     required
                     placeholder="you@company.com"
-                    className="mt-2 h-12 w-full rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] px-4 text-[15px] text-[#0A0A0A] placeholder:text-[#9CA3AF] outline-none transition-colors focus:border-[#93C5FD] focus:bg-white focus:ring-2 focus:ring-[#2563EB]/15"
+                    className="mt-2 h-12 w-full rounded-xl border border-[#e2e8f0] bg-white px-4 text-[15px] text-[#0f172a] placeholder:text-[#94a3b8] outline-none transition-colors focus:border-[#c4b5fd] focus:ring-2 focus:ring-[#635bff]/15"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="building"
-                    className="block text-[15px] font-medium text-[#0A0A0A]"
+                    className="block text-[15px] font-medium text-[#0f172a]"
                   >
                     Optional: What are you building?
                   </label>
@@ -144,7 +144,7 @@ export function EmailCapture() {
                     name="building"
                     rows={3}
                     placeholder="A sentence is enough."
-                    className="mt-2 w-full resize-none rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] px-4 py-3 text-[15px] text-[#0A0A0A] placeholder:text-[#9CA3AF] outline-none transition-colors focus:border-[#93C5FD] focus:bg-white focus:ring-2 focus:ring-[#2563EB]/15"
+                    className="mt-2 w-full resize-none rounded-xl border border-[#e2e8f0] bg-white px-4 py-3 text-[15px] text-[#0f172a] placeholder:text-[#94a3b8] outline-none transition-colors focus:border-[#c4b5fd] focus:ring-2 focus:ring-[#635bff]/15"
                   />
                 </div>
 
@@ -168,7 +168,7 @@ export function EmailCapture() {
                   className="h-12 w-full text-[15px]"
                   disabled={status === "loading"}
                 >
-                  {status === "loading" ? "Joining…" : "Get early access"}
+                  {status === "loading" ? "Joining..." : "Join early access"}
                 </PrimaryButton>
               </form>
             )}
