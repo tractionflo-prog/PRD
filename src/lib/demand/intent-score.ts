@@ -1,4 +1,5 @@
-import type { DemandSignalBand } from "./types";
+import { leadMatchesParsedIntent } from "./parse-demand-intent";
+import type { DemandParsedIntent, DemandSignalBand } from "./types";
 
 /** Inputs for demand lead scoring (0–100, quality-first). */
 export type DemandScoreInput = {
@@ -85,8 +86,11 @@ const HINT_STOP = new Set([
   "really",
 ]);
 
-/** Match literal product words + adjacent intent tokens; softer miss penalty so implied demand can still score. */
-function productRelevanceAdjust(blob: string, productHint?: string): number {
+/**
+ * Keyword overlap between post text and merged product / search angles (roughly −6 … +4).
+ * Exported for strict fetch-time gates — unrelated posts should not pass on vibes alone.
+ */
+export function getProductRelevanceDelta(blob: string, productHint?: string): number {
   const hint = productHint?.trim();
   if (!hint) return 0;
   const low = blob.toLowerCase();
@@ -134,6 +138,30 @@ function productRelevanceAdjust(blob: string, productHint?: string): number {
   return -6;
 }
 
+/** When structured intent exists, require parse gate plus product keyword tie; else require strong keyword bridge. */
+export function leadPassesFetchRelevanceGate(
+  title: string,
+  snippet: string,
+  productMerged: string,
+  parsedIntent?: DemandParsedIntent | null,
+): boolean {
+  const blob = `${title}\n${snippet}`;
+  const delta = getProductRelevanceDelta(blob, productMerged);
+  const hasParse =
+    !!parsedIntent &&
+    (parsedIntent.pain.trim().length > 0 || parsedIntent.audience.trim().length > 0);
+
+  if (hasParse && parsedIntent) {
+    if (!leadMatchesParsedIntent(title, snippet, parsedIntent)) return false;
+    return delta >= 2;
+  }
+  return delta >= 3;
+}
+
+function productRelevanceAdjust(blob: string, productHint?: string): number {
+  return getProductRelevanceDelta(blob, productHint);
+}
+
 const manualWorkflow =
   /\b(manually|by hand|one by one|in a spreadsheet|google sheets?|excel|copy[\s-]?paste|double (entry|work)|too many steps|every single time)\b/i;
 
@@ -148,7 +176,7 @@ const problemSignal =
 
 export function signalBandForIntentScore(score: number): DemandSignalBand {
   if (score >= 72) return "strong";
-  if (score >= 52) return "medium";
+  if (score >= 60) return "medium";
   return "early";
 }
 

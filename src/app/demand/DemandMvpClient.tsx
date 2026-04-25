@@ -1101,19 +1101,18 @@ export function DemandMvpClient() {
                   id="no-leads-heading"
                   className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl"
                 >
-                  No strong conversations found
+                  No strong public conversations found.
                 </h2>
-                <p className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-slate-600">
-                  We scanned real conversations, but didn&apos;t find strong matches for this problem
-                  right now.
+                <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-slate-600">
+                  But people are still dealing with this.
                 </p>
-                <div className="mx-auto mt-6 max-w-md text-left">
-                  <p className="text-[14px] font-medium text-slate-700">This usually means:</p>
-                  <ul className="mt-2 list-inside list-disc space-y-1.5 text-[14px] leading-relaxed text-slate-600">
-                    <li>people aren&apos;t discussing it publicly</li>
-                    <li>or they&apos;re solving it quietly</li>
-                  </ul>
-                </div>
+                <p className="mx-auto mt-2 max-w-lg text-[15px] font-medium leading-relaxed text-slate-800">
+                  Here are high-likelihood matches.
+                </p>
+                <p className="mx-auto mt-6 max-w-md text-left text-[14px] leading-relaxed text-slate-600">
+                  We only show threads that clearly echo your problem — so an empty list means we
+                  didn&apos;t find safe matches on Reddit right now, not that nobody cares.
+                </p>
               </div>
 
               <div

@@ -322,15 +322,11 @@ function LeadMatchCard({
 function PersonalizedLandingCard({
   card,
   copiedMessage,
-  copiedFollowUp,
   onCopyMessage,
-  onCopyFollowUp,
 }: {
   card: PersonalizedFallbackCard;
   copiedMessage: boolean;
-  copiedFollowUp: boolean;
   onCopyMessage: () => void;
-  onCopyFollowUp: () => void;
 }) {
   const reduceMotion = useReducedMotion();
   return (
@@ -392,34 +388,22 @@ function PersonalizedLandingCard({
         People search · paste:{" "}
         <span className="font-mono text-slate-700">{card.linkedInSearch}</span>
       </p>
-      <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 md:mt-6">
-        Message
+      <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 md:mt-5">
+        Message to send
       </p>
       <p className="mt-1.5 line-clamp-4 whitespace-pre-wrap rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-left text-[13px] leading-relaxed text-slate-800 md:mt-2 md:line-clamp-none md:py-3 md:text-[14px]">
         {card.message}
       </p>
-      <div className="mt-3 flex flex-col gap-2 md:mt-4 md:flex-row md:flex-wrap">
+      <p className="mt-2 text-[12px] leading-snug text-slate-500 md:mt-2.5 md:text-[13px]">
+        Start the conversation — we&apos;ll help with what to say next.
+      </p>
+      <div className="mt-3 flex flex-col gap-2 md:mt-3.5 md:flex-row md:flex-wrap">
         <button
           type="button"
           onClick={onCopyMessage}
           className={`inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-[14px] font-semibold text-slate-800 shadow-sm transition-colors hover:bg-slate-50 md:h-11 md:min-h-0 md:w-auto md:min-w-[10.5rem] ${pressable}`}
         >
           {copiedMessage ? "Copied" : "Copy message to send"}
-        </button>
-      </div>
-      <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 md:mt-8">
-        Follow-up
-      </p>
-      <p className="mt-1.5 line-clamp-3 whitespace-pre-wrap rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-left text-[13px] leading-relaxed text-slate-800 md:mt-2 md:line-clamp-none md:py-3 md:text-[14px]">
-        {card.followUp}
-      </p>
-      <div className="mt-3 md:mt-4">
-        <button
-          type="button"
-          onClick={onCopyFollowUp}
-          className={`inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-[14px] font-semibold text-slate-800 shadow-sm transition-colors hover:bg-slate-50 md:h-11 md:min-h-0 md:w-auto md:min-w-[10.5rem] ${pressable}`}
-        >
-          {copiedFollowUp ? "Copied" : "Copy follow-up"}
         </button>
       </div>
     </motion.div>
@@ -1074,9 +1058,7 @@ export function HeroDemandPreview() {
                   <PersonalizedLandingCard
                     card={personalizedFallback}
                     copiedMessage={copied === "msg"}
-                    copiedFollowUp={copied === "follow"}
                     onCopyMessage={() => void copyText("msg", personalizedFallback.message)}
-                    onCopyFollowUp={() => void copyText("follow", personalizedFallback.followUp)}
                   />
                 </UnlockMoreMoment>
               </motion.div>

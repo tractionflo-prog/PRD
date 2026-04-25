@@ -1,10 +1,10 @@
 import {
   explainDemandIntent,
   hardExcludeDemandPost,
+  leadPassesFetchRelevanceGate,
   scoreDemandLead,
   signalBandForIntentScore,
 } from "./intent-score";
-import { leadMatchesParsedIntent } from "./parse-demand-intent";
 import { getLeadProvider } from "./providers/registry";
 import type {
   CommunitySourceId,
@@ -16,7 +16,7 @@ import type { ProviderSearchHit } from "./providers/types";
 
 const DAY = 86400;
 const HOUR = 3600;
-const MIN_SCORE = 52;
+const MIN_SCORE = 62;
 const MAX_LEADS = 8;
 const MIN_CONTENT_WORDS = 18;
 
@@ -117,9 +117,9 @@ function orderAndCapLeads(leads: DemandLead[]): DemandLead[] {
 
 /**
  * Dedupe → max 7d → time window (72h if enough, else 7d) → hard excludes
- * → score (with product relevance) → keep score ≥ 52 → optional intent keyword gate (skipped if empty)
+ * → score → keep score ≥ MIN_SCORE → strict keyword + parsed-intent relevance gate
  * → sort → cap (mixed tiers).
- * No mock leads — empty list means nothing scored ≥ 65 or nothing matched parsed intent.
+ * No mock leads — empty list is preferred over weak or off-topic matches.
  */
 export async function fetchDemandLeadsFromQueries(
   product: string,
@@ -167,7 +167,8 @@ export async function fetchDemandLeadsFromQueries(
 
   const scored = timeScoped
     .map((h) => toDemandLead(h, product))
-    .filter((l) => l.intentScore >= MIN_SCORE);
+    .filter((l) => l.intentScore >= MIN_SCORE)
+    .filter((l) => leadPassesFetchRelevanceGate(l.title, l.snippet, product, parsedIntent));
 
   scored.sort((a, b) => {
     const tierA = a.intentScore >= 75 ? 1 : 0;
@@ -179,16 +180,7 @@ export async function fetchDemandLeadsFromQueries(
     return tb - ta;
   });
 
-  let top = orderAndCapLeads(scored);
-
-  if (parsedIntent && (parsedIntent.pain.trim() || parsedIntent.audience.trim())) {
-    const gated = top.filter((l) =>
-      leadMatchesParsedIntent(l.title, l.snippet, parsedIntent),
-    );
-    if (gated.length > 0) {
-      top = orderAndCapLeads(gated);
-    }
-  }
+  const top = orderAndCapLeads(scored);
 
   const notice = top.length === 0 ? "no_direct_conversations" : undefined;
 

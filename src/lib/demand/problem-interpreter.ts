@@ -1,6 +1,7 @@
-import { buildPersonalizedOutreachDm } from "./context-aware-reply";
+import { buildPersonalizedOutreachDm, type InterpretationReplySlice } from "./context-aware-reply";
 import { openaiJson } from "./openai-json";
 import { isGenericProductInput } from "./generic-input";
+import { leadMatchesParsedIntent } from "./parse-demand-intent";
 import { dedupeQueries } from "./reddit-deterministic-queries";
 import type { DemandLead } from "./types";
 
@@ -170,8 +171,8 @@ export function redditQueriesFromInterpretation(i: ProblemInterpretationOk): str
 }
 
 /**
- * Require a problem signal (pain or search keyword) plus supporting signal
- * (audience, context, or second problem hit) so unrelated threads drop out.
+ * Strict keyword gate on top of parsed-intent match: domain anchors (category, clean problem,
+ * long keywords) so generic “startup pain” threads do not pass on a single vague token.
  */
 export function leadPassesRelevanceFilter(
   title: string,
@@ -180,17 +181,39 @@ export function leadPassesRelevanceFilter(
 ): boolean {
   const blob = `${title}\n${snippet}`.toLowerCase();
 
+  const parsed = interpretationToParsedIntent(i);
+  if (!leadMatchesParsedIntent(title, snippet, parsed)) return false;
+
   const painToks = tokensFromText(i.pain, 5);
+  const cleanToks = tokensFromText(i.cleanProblem, 5);
+  const catToks = tokensFromText(i.productCategory, 6);
   const kwHits = i.searchKeywords
     .map((k) => k.trim().toLowerCase())
     .filter((k) => k.length >= 3);
+
   let problemHits = 0;
   for (const t of painToks) {
+    if (blob.includes(t)) problemHits++;
+  }
+  for (const t of cleanToks) {
     if (blob.includes(t)) problemHits++;
   }
   for (const k of kwHits) {
     if (k.length >= 10 && blob.includes(k)) problemHits += 2;
     else if (blob.includes(k)) problemHits++;
+  }
+
+  let domainAnchors = 0;
+  for (const t of catToks) {
+    if (blob.includes(t)) domainAnchors++;
+  }
+  for (const k of kwHits) {
+    if (k.length >= 8 && blob.includes(k)) domainAnchors++;
+  }
+  const cleanPhrase = collapseOutreach(i.cleanProblem).toLowerCase();
+  if (cleanPhrase.length >= 14) {
+    const chunk = cleanPhrase.slice(0, 28);
+    if (chunk.length >= 12 && blob.includes(chunk)) domainAnchors += 2;
   }
 
   const audToks = i.audience.flatMap((a) => tokensFromText(a, 4));
@@ -200,9 +223,9 @@ export function leadPassesRelevanceFilter(
     if (blob.includes(t)) supportHits++;
   }
 
-  const hasProblem = problemHits >= 1;
-  const hasSupport = supportHits >= 1 || problemHits >= 2;
-  return hasProblem && hasSupport;
+  const anchored = domainAnchors >= 1 || problemHits >= 2;
+  const supported = supportHits >= 1 || domainAnchors >= 2 || problemHits >= 3;
+  return anchored && supported;
 }
 
 /** Numeric relevance for ranking (not a hard gate). */
@@ -229,19 +252,15 @@ export function landingRelevanceWeight(
   return w;
 }
 
-/** Prefer strict relevance + intent; still surfaces medium-intent when ranked fairly. */
+/** Callers should pre-filter with `leadPassesRelevanceFilter`; ranking blends overlap weight + intent. */
 export function rankLandingPreviewLeads(
   leads: DemandLead[],
   i: ProblemInterpretationOk,
 ): DemandLead[] {
   return [...leads].sort((a, b) => {
-    const strictA = leadPassesRelevanceFilter(a.title, a.snippet, i) ? 45 : 0;
-    const strictB = leadPassesRelevanceFilter(b.title, b.snippet, i) ? 45 : 0;
     const ra = landingRelevanceWeight(a.title, a.snippet, i);
     const rb = landingRelevanceWeight(b.title, b.snippet, i);
-    const scoreA = strictA + ra * 2.5 + a.intentScore;
-    const scoreB = strictB + rb * 2.5 + b.intentScore;
-    return scoreB - scoreA;
+    return rb * 2.5 + b.intentScore - (ra * 2.5 + a.intentScore);
   });
 }
 
@@ -390,18 +409,36 @@ function deriveOutreachFields(i: {
   };
 }
 
+/** Reply slice with outreach phrases derived from pain/context so DMs stay problem-specific. */
+export function interpretationToReplySlice(i: ProblemInterpretationOk): InterpretationReplySlice {
+  const d = deriveOutreachFields(i);
+  return {
+    audience: i.audience,
+    pain: i.pain,
+    context: i.context,
+    cleanProblem: i.cleanProblem,
+    outreachGroupPhrase: d.outreachGroupPhrase,
+    outreachActivityPhrase: d.outreachActivityPhrase,
+    outreachSituationPhrase: d.outreachSituationPhrase,
+  };
+}
+
 /** Deterministic outreach copy — only from interpreted fields (no LLM). */
 export function buildTemplatePersonalizedCard(i: ProblemInterpretationOk): PersonalizedFallbackCard {
-  const rawPain = collapseOutreach(i.pain) || collapseOutreach(i.cleanProblem);
+  const d = deriveOutreachFields(i);
+  const rawPain =
+    collapseOutreach(i.pain) ||
+    collapseOutreach(i.cleanProblem) ||
+    collapseOutreach(i.conversationAngle);
   const painForLine = rawPain
     ? rawPain.charAt(0).toLowerCase() + rawPain.slice(1).slice(0, 78)
     : undefined;
 
   const message = buildPersonalizedOutreachDm(
     {
-      outreachGroupPhrase: i.outreachGroupPhrase,
-      outreachActivityPhrase: i.outreachActivityPhrase,
-      outreachSituationPhrase: i.outreachSituationPhrase,
+      outreachGroupPhrase: d.outreachGroupPhrase,
+      outreachActivityPhrase: d.outreachActivityPhrase,
+      outreachSituationPhrase: d.outreachSituationPhrase,
       ...(painForLine ? { painForDealingLine: painForLine } : {}),
     },
     0,

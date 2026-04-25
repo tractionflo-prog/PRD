@@ -7,6 +7,8 @@ import {
   interpretUserProblem,
   interpretationToParsedIntent,
   interpretationToProductContext,
+  interpretationToReplySlice,
+  leadPassesRelevanceFilter,
   rankLandingPreviewLeads,
   redditQueriesFromInterpretation,
   type PersonalizedFallbackCard,
@@ -153,7 +155,8 @@ export async function POST(request: Request) {
     parsedIntent,
   );
 
-  const rankedLeads = rankLandingPreviewLeads(leads, i).slice(0, 2).map(sanitizeLeadForPreview);
+  const relevant = leads.filter((l) => leadPassesRelevanceFilter(l.title, l.snippet, i));
+  const rankedLeads = rankLandingPreviewLeads(relevant, i).slice(0, 2).map(sanitizeLeadForPreview);
 
   const replyDrafts: { id: string; reply: string }[] = [];
   if (rankedLeads.length > 0) {
@@ -166,7 +169,7 @@ export async function POST(request: Request) {
         url: l.url,
       })),
       key,
-      i,
+      interpretationToReplySlice(i),
     );
     for (const r of replies) {
       if (r.reply?.trim()) replyDrafts.push({ id: r.id, reply: r.reply.trim() });
