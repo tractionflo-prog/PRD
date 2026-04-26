@@ -87,7 +87,7 @@ export function Navbar() {
       }}
       className={cn(
         "top-0 z-50 w-full border-b pt-[env(safe-area-inset-top,0px)] transition-[background-color,backdrop-filter,border-color,box-shadow,padding] duration-300",
-        isHome ? "fixed" : "sticky",
+        isHome ? "fixed inset-x-0 top-0" : "sticky",
         transparentHome
           ? "border-transparent bg-transparent shadow-none"
           : solidDarkBar
@@ -97,7 +97,7 @@ export function Navbar() {
     >
       <nav
         className={cn(
-          "mx-auto flex min-h-[3.25rem] w-full min-w-0 max-w-[1200px] flex-wrap items-center justify-between gap-x-2 gap-y-2 px-4 transition-[padding,min-height] duration-300 sm:h-14 sm:min-h-0 sm:gap-x-6 sm:gap-y-0 sm:px-8 sm:py-0",
+          "mx-auto flex min-h-[3.25rem] w-full min-w-0 max-w-[1200px] flex-nowrap items-center justify-between gap-x-2 px-4 transition-[padding,min-height] duration-300 sm:h-14 sm:min-h-0 sm:gap-x-6 sm:px-8 sm:py-0",
           isHome && pastHero ? "py-1.5 sm:py-0" : "py-2 sm:py-0",
         )}
         aria-label="Primary"
@@ -113,8 +113,8 @@ export function Navbar() {
           {BRAND}
         </Link>
 
-        <div className="flex min-w-0 max-w-full flex-1 basis-[min(100%,18rem)] items-center justify-end gap-2 sm:basis-auto sm:gap-8">
-          <ul className="flex min-w-0 max-w-full flex-1 items-center justify-end gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-none sm:gap-8 [&::-webkit-scrollbar]:hidden">
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5 sm:gap-8">
+          <ul className="flex min-w-0 flex-1 items-center justify-start gap-1.5 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-none sm:justify-end sm:gap-8 [&::-webkit-scrollbar]:hidden">
             {links.map((link) => {
               const Icon = link.Icon;
               return (
