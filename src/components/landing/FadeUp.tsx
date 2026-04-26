@@ -1,5 +1,6 @@
 "use client";
 
+import { useMobilePerfLayout } from "@/lib/use-mobile-perf-layout";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef, type ReactNode } from "react";
 
@@ -31,7 +32,11 @@ export function FadeUp({
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-12% 0px" });
   const reduceMotion = useReducedMotion();
+  const mobilePerf = useMobilePerfLayout();
   const { initialY, duration } = presets[preset];
+  const y = mobilePerf ? Math.min(initialY, 10) : initialY;
+  const dur = mobilePerf ? Math.min(duration, 0.38) : duration;
+  const dly = mobilePerf ? Math.min(delay, 0.08) : delay;
 
   if (reduceMotion) {
     return <div className={className}>{children}</div>;
@@ -40,11 +45,11 @@ export function FadeUp({
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: initialY }}
+      initial={{ opacity: 0, y }}
       animate={isInView ? { opacity: 1, y: 0 } : undefined}
       transition={{
-        duration,
-        delay,
+        duration: dur,
+        delay: dly,
         ease: [0.22, 1, 0.36, 1],
       }}
       className={className}

@@ -24,6 +24,12 @@
   }
 }
 
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 html {
   overflow-x: clip;
 }
@@ -204,6 +210,33 @@ body {
 
   .hero-thread-float-b {
     animation: hero-float 16s ease-in-out infinite reverse;
+  }
+}
+
+/**
+ * Mobile perf: large blurs + ribbon motion are expensive on low‑end GPUs.
+ * Keep the hero readable; desktop keeps full treatment.
+ */
+@media (max-width: 767px) {
+  .hero-ribbons {
+    display: none;
+  }
+
+  .hero-premium-grid {
+    opacity: 0.55;
+    mask-image: radial-gradient(ellipse 90% 75% at 50% 0%, black 35%, transparent 78%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 75% at 50% 0%, black 35%, transparent 78%);
+  }
+
+  .hero-ribbon-1,
+  .hero-ribbon-2,
+  .hero-ribbon-3 {
+    animation: none !important;
+  }
+
+  .hero-float-preview,
+  .hero-float-preview-alt {
+    animation: none !important;
   }
 }
 

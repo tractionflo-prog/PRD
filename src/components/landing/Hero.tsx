@@ -1,5 +1,24 @@
+import dynamic from "next/dynamic";
 import { FadeUp } from "./FadeUp";
-import { HeroDemandPreview } from "./HeroDemandPreview";
+
+const HeroDemandPreview = dynamic(
+  () => import("./HeroDemandPreview").then((m) => ({ default: m.HeroDemandPreview })),
+  {
+    ssr: true,
+    loading: () => (
+      <div
+        className="mx-auto mt-2 min-h-[7.5rem] w-full max-w-3xl rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-8 shadow-[0_1px_2px_rgba(15,23,42,0.04)] md:shadow-sm"
+        aria-hidden
+      >
+        <div className="mx-auto h-3 w-40 rounded-full bg-slate-200/90" />
+        <div className="mx-auto mt-4 h-20 max-w-xl rounded-xl bg-slate-100/90" />
+        <div className="mx-auto mt-5 flex justify-center">
+          <div className="h-11 w-36 rounded-full bg-indigo-100/90 sm:w-[10.5rem]" />
+        </div>
+      </div>
+    ),
+  },
+);
 
 export function Hero() {
   return (
@@ -13,24 +32,28 @@ export function Hero() {
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -left-[20%] top-0 h-[min(28rem,70vw)] w-[min(28rem,70vw)] rounded-full bg-indigo-400/18 blur-3xl"
+        className="pointer-events-none absolute -left-[20%] top-0 hidden h-[min(28rem,70vw)] w-[min(28rem,70vw)] rounded-full bg-indigo-400/18 blur-3xl md:block"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -right-[15%] top-[10%] h-[min(24rem,65vw)] w-[min(26rem,68vw)] rounded-full bg-violet-400/14 blur-3xl"
+        className="pointer-events-none absolute -right-[15%] top-[10%] hidden h-[min(24rem,65vw)] w-[min(26rem,68vw)] rounded-full bg-violet-400/14 blur-3xl md:block"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-[min(100%,36rem)] -translate-x-1/2 rounded-full bg-sky-300/10 blur-3xl"
+        className="pointer-events-none absolute bottom-0 left-1/2 h-44 w-[min(92%,20rem)] -translate-x-1/2 rounded-full bg-sky-300/10 blur-2xl md:hidden"
         aria-hidden
       />
-      <div className="hero-premium-grid pointer-events-none absolute inset-0" aria-hidden />
       <div
-        className="pointer-events-none absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.04%22/%3E%3C/svg%3E')] opacity-[0.35] mix-blend-multiply"
+        className="pointer-events-none absolute bottom-0 left-1/3 hidden h-72 w-[min(100%,36rem)] -translate-x-1/2 rounded-full bg-sky-300/10 blur-3xl md:block"
+        aria-hidden
+      />
+      <div className="hero-premium-grid pointer-events-none absolute inset-0 max-md:opacity-40" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 hidden bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.04%22/%3E%3C/svg%3E')] opacity-[0.35] mix-blend-multiply md:block"
         aria-hidden
       />
 
-      <div className="hero-gradient-animated absolute inset-0 min-h-full opacity-50" aria-hidden />
+      <div className="hero-gradient-animated absolute inset-0 min-h-full opacity-40 max-md:opacity-35 md:opacity-50" aria-hidden />
       <div className="hero-ribbons" aria-hidden>
         <div className="hero-ribbon hero-ribbon-1" />
         <div className="hero-ribbon hero-ribbon-2" />

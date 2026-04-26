@@ -67,10 +67,10 @@ export function ValueSection() {
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 whileHover={reduceMotion ? undefined : { y: -6 }}
-                className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/90 p-7 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.14),0_0_0_1px_rgba(15,23,42,0.04)] ring-1 ring-slate-200/40 backdrop-blur-md sm:p-8"
+                className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/95 p-7 shadow-[0_14px_36px_-24px_rgba(15,23,42,0.1),0_0_0_1px_rgba(15,23,42,0.04)] ring-1 ring-slate-200/40 backdrop-blur-none sm:p-8 md:bg-white/90 md:shadow-[0_20px_50px_-32px_rgba(15,23,42,0.14),0_0_0_1px_rgba(15,23,42,0.04)] md:backdrop-blur-md"
               >
                 <div
-                  className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br from-indigo-400/15 to-violet-400/10 blur-2xl transition-opacity duration-500 group-hover:opacity-100 sm:h-40 sm:w-40"
+                  className="pointer-events-none absolute -right-8 -top-8 max-md:hidden h-32 w-32 rounded-full bg-gradient-to-br from-indigo-400/15 to-violet-400/10 blur-2xl transition-opacity duration-500 group-hover:opacity-100 sm:h-40 sm:w-40"
                   aria-hidden
                 />
                 <div className="relative flex items-start justify-between gap-4">

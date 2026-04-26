@@ -99,11 +99,11 @@ export function EmailCapture() {
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-indigo-300/20 blur-3xl"
+        className="pointer-events-none absolute -left-24 bottom-0 h-56 w-56 rounded-full bg-indigo-300/18 blur-2xl max-md:opacity-80 md:h-72 md:w-72 md:blur-3xl md:opacity-100"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -right-16 top-12 h-64 w-64 rounded-full bg-violet-300/15 blur-3xl"
+        className="pointer-events-none absolute -right-16 top-12 h-52 w-52 rounded-full bg-violet-300/14 blur-2xl max-md:opacity-75 md:h-64 md:w-64 md:blur-3xl md:opacity-100"
         aria-hidden
       />
 
@@ -132,10 +132,10 @@ export function EmailCapture() {
           className="relative mt-10"
         >
           <div
-            className="pointer-events-none absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br from-white/80 via-indigo-100/30 to-violet-100/25 opacity-90 blur-xl"
+            className="pointer-events-none absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br from-white/80 via-indigo-100/30 to-violet-100/25 opacity-90 blur-lg max-md:opacity-70 max-md:blur-md md:blur-xl"
             aria-hidden
           />
-          <div className="relative overflow-hidden rounded-2xl bg-white/85 p-6 shadow-[0_24px_60px_-32px_rgba(15,23,42,0.18),0_0_0_1px_rgba(255,255,255,0.9)_inset] ring-1 ring-slate-200/60 backdrop-blur-xl sm:p-8">
+          <div className="relative overflow-hidden rounded-2xl bg-white/90 p-6 shadow-[0_16px_40px_-24px_rgba(15,23,42,0.14),0_0_0_1px_rgba(255,255,255,0.9)_inset] ring-1 ring-slate-200/60 backdrop-blur-md sm:p-8 md:bg-white/85 md:shadow-[0_24px_60px_-32px_rgba(15,23,42,0.18),0_0_0_1px_rgba(255,255,255,0.9)_inset] md:backdrop-blur-xl">
             {status === "success" ? (
               <p
                 className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3.5 text-[15px] font-medium leading-relaxed text-emerald-900"

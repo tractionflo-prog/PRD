@@ -1,9 +1,11 @@
 "use client";
 
+import { useMobilePerfLayout } from "@/lib/use-mobile-perf-layout";
 import { motion, useReducedMotion } from "framer-motion";
 
 export function CoreIdeaSection() {
   const reduceMotion = useReducedMotion();
+  const mobilePerf = useMobilePerfLayout();
 
   return (
     <section
@@ -15,10 +17,10 @@ export function CoreIdeaSection() {
         aria-hidden
       />
       <motion.div
-        className="pointer-events-none absolute inset-0 opacity-40"
+        className="pointer-events-none absolute inset-0 opacity-40 max-md:opacity-25"
         aria-hidden
         animate={
-          reduceMotion
+          reduceMotion || mobilePerf
             ? undefined
             : {
                 backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],

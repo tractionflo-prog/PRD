@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import { useMobilePerfLayout } from "@/lib/use-mobile-perf-layout";
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -35,6 +36,7 @@ export function Navbar() {
   const [pastHero, setPastHero] = useState(false);
   const ticking = useRef(false);
   const reduceMotion = useReducedMotion();
+  const mobilePerf = useMobilePerfLayout();
 
   useEffect(() => {
     if (!isHome) {
@@ -80,7 +82,7 @@ export function Navbar() {
       initial={reduceMotion ? false : { opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: reduceMotion ? 0 : 0.64,
+        duration: reduceMotion ? 0 : mobilePerf ? 0.38 : 0.64,
         ease: [0.22, 1, 0.36, 1],
       }}
       className={cn(
@@ -89,8 +91,8 @@ export function Navbar() {
         transparentHome
           ? "border-transparent bg-transparent shadow-none"
           : solidDarkBar
-            ? "border-white/10 bg-black/45 shadow-[0_12px_40px_-28px_rgba(0,0,0,0.85)] backdrop-blur-xl"
-            : "border-[#e2e8f0] bg-white/80 shadow-[0_8px_30px_-24px_rgba(15,23,42,0.06)] backdrop-blur-xl",
+            ? "border-white/10 bg-black/50 shadow-[0_10px_28px_-22px_rgba(0,0,0,0.75)] backdrop-blur-md max-md:bg-black/55 md:bg-black/45 md:shadow-[0_12px_40px_-28px_rgba(0,0,0,0.85)] md:backdrop-blur-xl"
+            : "border-[#e2e8f0] bg-white/85 shadow-[0_6px_22px_-18px_rgba(15,23,42,0.05)] backdrop-blur-md md:bg-white/80 md:shadow-[0_8px_30px_-24px_rgba(15,23,42,0.06)] md:backdrop-blur-xl",
       )}
     >
       <nav

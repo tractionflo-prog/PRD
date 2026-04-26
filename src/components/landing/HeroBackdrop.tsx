@@ -17,22 +17,22 @@ export function HeroBackdrop() {
       }}
     >
       <Image
-        src="/hero-mobile.png"
+        src="/hero-mobile.jpg"
         alt=""
         fill
         priority
         sizes="100vw"
-        quality={85}
+        quality={72}
         className="object-cover object-[right_center] md:hidden"
         decoding="async"
       />
       <Image
-        src="/hero.png"
+        src="/hero-desktop.jpg"
         alt=""
         fill
         priority
         sizes="100vw"
-        quality={85}
+        quality={78}
         className="hidden object-cover object-[right_center] md:block lg:object-[center_22%]"
         decoding="async"
       />

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import { MAX_DEMO_INPUT_LENGTH } from "@/lib/demand/landing-demo-constants";
 import { formatDemandSignalLabel, signalBandForIntentScore } from "@/lib/demand/intent-score";
 import type { ApolloPreviewLead, DemandLead } from "@/lib/demand/types";
 import type { PersonalizedFallbackCard } from "@/lib/demand/problem-interpreter";
@@ -911,6 +912,12 @@ export function HeroDemandPreview({ ambient = "light" }: { ambient?: "light" | "
     async (rawText: string) => {
       const trimmed = rawText.trim();
       if (!trimmed || loading) return;
+      if (trimmed.length > MAX_DEMO_INPUT_LENGTH) {
+        setError(
+          `Keep your description under ${MAX_DEMO_INPUT_LENGTH} characters for the demo.`,
+        );
+        return;
+      }
 
       setLoading(true);
       setError(null);
@@ -949,11 +956,11 @@ export function HeroDemandPreview({ ambient = "light" }: { ambient?: "light" | "
         }
 
         if (!res.ok) {
-          setError(
+          const msg =
             typeof data.error === "string"
               ? data.error
-              : "Could not prepare your preview. Try a bit more detail.",
-          );
+              : "Could not prepare your preview. Try a bit more detail.";
+          setError(msg);
           return;
         }
 
@@ -1176,6 +1183,7 @@ export function HeroDemandPreview({ ambient = "light" }: { ambient?: "light" | "
               id="hero-problem"
               rows={2}
               value={problem}
+              maxLength={MAX_DEMO_INPUT_LENGTH}
               onChange={(e) => setProblem(e.target.value)}
               disabled={loading}
               placeholder="landlords struggling to track rent payments"
@@ -1183,7 +1191,11 @@ export function HeroDemandPreview({ ambient = "light" }: { ambient?: "light" | "
             />
             <button
               type="submit"
-              disabled={loading || !problem.trim()}
+              disabled={
+                loading ||
+                !problem.trim() ||
+                problem.trim().length > MAX_DEMO_INPUT_LENGTH
+              }
               aria-label={loading ? "Working on preview" : "Find people"}
               className={`inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-indigo-600 px-6 text-[14px] font-medium text-white shadow-lg shadow-indigo-600/20 transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 ${pressableDisabled}`}
             >
@@ -1201,6 +1213,21 @@ export function HeroDemandPreview({ ambient = "light" }: { ambient?: "light" | "
             </button>
           </div>
         </div>
+        <p
+          className={cn(
+            "mt-2 text-center text-[12px] tabular-nums sm:text-left",
+            problem.length >= MAX_DEMO_INPUT_LENGTH
+              ? ambient === "dark"
+                ? "text-amber-200/90"
+                : "text-amber-700"
+              : ambient === "dark"
+                ? "text-white/45"
+                : "text-slate-400",
+          )}
+          aria-live="polite"
+        >
+          {problem.length}/{MAX_DEMO_INPUT_LENGTH}
+        </p>
 
         <p
           className={cn(

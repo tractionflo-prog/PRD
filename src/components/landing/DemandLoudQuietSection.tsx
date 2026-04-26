@@ -56,7 +56,7 @@ function FloatCard({
       viewport={{ once: true, margin: "-8%" }}
       transition={{ duration: 0.55, delay: reduceMotion ? 0 : delay, ease: [0.22, 1, 0.36, 1] }}
       whileHover={reduceMotion ? undefined : { y: -4 }}
-      className={`rounded-2xl px-4 py-3.5 backdrop-blur-md sm:px-5 sm:py-4 ${loudTone}`}
+      className={`rounded-2xl px-4 py-3.5 backdrop-blur-none sm:px-5 sm:py-4 md:backdrop-blur-md ${loudTone}`}
     >
       <p className="text-[11px] font-semibold uppercase tracking-wide text-indigo-600/90">{item.name}</p>
       <p className="mt-1.5 text-sm font-medium leading-snug text-slate-900 sm:text-[15px]">
@@ -80,11 +80,11 @@ export function DemandLoudQuietSection() {
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute left-0 top-0 h-[420px] w-[min(100%,28rem)] bg-gradient-to-br from-indigo-200/30 via-transparent to-transparent blur-2xl md:h-[520px]"
+        className="pointer-events-none absolute left-0 top-0 h-[280px] w-[min(100%,22rem)] bg-gradient-to-br from-indigo-200/28 via-transparent to-transparent blur-xl max-md:opacity-80 md:h-[420px] md:w-[min(100%,28rem)] md:blur-2xl md:opacity-100 lg:h-[520px]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute bottom-0 right-0 h-[380px] w-[min(100%,24rem)] bg-gradient-to-tl from-violet-200/25 via-transparent to-transparent blur-2xl"
+        className="pointer-events-none absolute bottom-0 right-0 h-[240px] w-[min(100%,18rem)] bg-gradient-to-tl from-violet-200/22 via-transparent to-transparent blur-xl max-md:opacity-75 md:h-[380px] md:w-[min(100%,24rem)] md:blur-2xl md:opacity-100"
         aria-hidden
       />
 

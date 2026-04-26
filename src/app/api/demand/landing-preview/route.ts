@@ -14,11 +14,28 @@ import {
   type PersonalizedFallbackCard,
   type ProblemInterpretationOk,
 } from "@/lib/demand/problem-interpreter";
-import { fetchRankedApolloPreviewLeads } from "@/lib/demand/apollo-landing-preview";
+import { buildStaticLandingDemo } from "@/lib/demand/landing-preview-static-demo";
+import { MAX_DEMO_INPUT_LENGTH } from "@/lib/demand/landing-demo-constants";
+import {
+  buildDemoCookieHeader,
+  DEMO_COOLDOWN_MS,
+  DEMO_IP_DAILY_LIMIT,
+  DEMO_SESSION_LIMIT,
+  getClientIp,
+  getIpDayCount,
+  incrementIpDayCount,
+  readDemoCookie,
+  tryConsumeOpenAiGlobal,
+  type CookiePayload,
+} from "@/lib/demand/landing-preview-rate-limit";
 import type { ApolloPreviewLead, DemandLead } from "@/lib/demand/types";
 import { NextResponse } from "next/server";
 
-const MAX_RAW = 2000;
+const ERR_IP_DAILY =
+  "Demo limit reached for today. Join the waitlist and we'll notify you when full access opens.";
+const ERR_SESSION =
+  "You've reached the preview limit for this browser. Join the waitlist and we'll notify you when full access opens.";
+const ERR_COOLDOWN = "Please wait a few seconds before searching again.";
 
 export type LandingPreviewClarifyResponse = {
   ok: true;
@@ -51,6 +68,7 @@ export type LandingPreviewResultResponse = {
   apolloLeads?: ApolloPreviewLead[];
   apolloCopyDraft?: string;
   apolloFallbackUsed?: boolean;
+  staticDemo?: true;
 };
 
 export type LandingPreviewResponse =
@@ -66,7 +84,16 @@ function sanitizeLeadForPreview(lead: DemandLead): DemandLead {
   };
 }
 
+function demoSuccessHeaders(ip: string, prev: CookiePayload): HeadersInit {
+  incrementIpDayCount(ip);
+  const next: CookiePayload = { v: 1, sc: prev.sc + 1, last: Date.now() };
+  return { "Set-Cookie": buildDemoCookieHeader(next) };
+}
+
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const demoCookie = readDemoCookie(request);
+
   let body: unknown;
   try {
     body = await request.json();
@@ -78,6 +105,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid payload." }, { status: 400 });
   }
 
+  if (getIpDayCount(ip) >= DEMO_IP_DAILY_LIMIT) {
+    return NextResponse.json({ error: ERR_IP_DAILY, code: "ip_daily" }, { status: 429 });
+  }
+  if (demoCookie.sc >= DEMO_SESSION_LIMIT) {
+    return NextResponse.json({ error: ERR_SESSION, code: "session_limit" }, { status: 429 });
+  }
+  if (demoCookie.last > 0 && Date.now() - demoCookie.last < DEMO_COOLDOWN_MS) {
+    return NextResponse.json(
+      { error: ERR_COOLDOWN, code: "cooldown" },
+      { status: 429, headers: { "Retry-After": "10" } },
+    );
+  }
+
   const { rawInput } = body as { rawInput?: unknown };
   if (typeof rawInput !== "string" || !rawInput.trim()) {
     return NextResponse.json(
@@ -86,16 +126,46 @@ export async function POST(request: Request) {
     );
   }
 
-  const key = process.env.OPENAI_API_KEY?.trim();
-  if (!key) {
+  if (rawInput.length > MAX_DEMO_INPUT_LENGTH) {
     return NextResponse.json(
-      { error: "This preview is temporarily unavailable." },
-      { status: 503 },
+      {
+        error: `Keep your description under ${MAX_DEMO_INPUT_LENGTH} characters for the demo.`,
+      },
+      { status: 400 },
     );
   }
 
-  const trimmed = rawInput.trim().slice(0, MAX_RAW);
-  const result = await interpretUserProblem(trimmed, key);
+  const trimmed = rawInput.trim();
+
+  const openAiKey = process.env.OPENAI_API_KEY?.trim();
+
+  /** Live OpenAI path: no Apollo on waitlist demo. Static fallback when no key or global cap is full. */
+  const serveStaticDemo = () => {
+    const payload = buildStaticLandingDemo(trimmed);
+    return NextResponse.json(payload, {
+      status: 200,
+      headers: demoSuccessHeaders(ip, demoCookie),
+    });
+  };
+
+  if (!openAiKey) {
+    return serveStaticDemo();
+  }
+
+  if (!tryConsumeOpenAiGlobal(1)) {
+    return serveStaticDemo();
+  }
+
+  let result: Awaited<ReturnType<typeof interpretUserProblem>>;
+  try {
+    result = await interpretUserProblem(trimmed, openAiKey);
+  } catch (e) {
+    console.warn("[landing-preview] interpretUserProblem failed", {
+      message: e instanceof Error ? e.message : String(e),
+    });
+    return serveStaticDemo();
+  }
+
   if (!result) {
     return NextResponse.json(
       {
@@ -113,7 +183,7 @@ export async function POST(request: Request) {
       clarifyingQuestion: result.clarifyingQuestion,
       suggestedRefinements: result.suggestedRefinements,
     };
-    return NextResponse.json(payload);
+    return NextResponse.json(payload, { headers: demoSuccessHeaders(ip, demoCookie) });
   }
 
   if (result.kind === "refine") {
@@ -126,7 +196,7 @@ export async function POST(request: Request) {
       ...(result.cleanProblem ? { cleanProblem: result.cleanProblem } : {}),
       confidence: result.confidence,
     };
-    return NextResponse.json(payload);
+    return NextResponse.json(payload, { headers: demoSuccessHeaders(ip, demoCookie) });
   }
 
   const i: ProblemInterpretationOk = result;
@@ -149,7 +219,7 @@ export async function POST(request: Request) {
       replyDrafts: [],
       personalizedFallback: fb,
     };
-    return NextResponse.json(payload);
+    return NextResponse.json(payload, { headers: demoSuccessHeaders(ip, demoCookie) });
   }
 
   const parsedIntent = interpretationToParsedIntent(i);
@@ -165,47 +235,32 @@ export async function POST(request: Request) {
 
   const replyDrafts: { id: string; reply: string }[] = [];
   if (rankedLeads.length > 0) {
-    const replies = await generateDemandReplies(
-      baseContext,
-      rankedLeads.map((l) => ({
-        id: l.id,
-        title: l.title,
-        snippet: l.snippet,
-        url: l.url,
-      })),
-      key,
-      interpretationToReplySlice(i),
-    );
-    for (const r of replies) {
-      if (r.reply?.trim()) replyDrafts.push({ id: r.id, reply: r.reply.trim() });
-    }
-  }
-
-  let personalizedFallback =
-    rankedLeads.length === 0 ? buildTemplatePersonalizedCard(i) : null;
-
-  let apolloLeads: ApolloPreviewLead[] | undefined;
-  let apolloCopyDraft: string | undefined;
-  let apolloFallbackUsed: boolean | undefined;
-
-  if (rankedLeads.length === 0) {
-    const apolloKey = process.env.APOLLO_API_KEY?.trim();
-    if (apolloKey) {
+    if (tryConsumeOpenAiGlobal(1)) {
       try {
-        const apollo = await fetchRankedApolloPreviewLeads(i, key, apolloKey);
-        if (apollo.leads.length > 0) {
-          apolloLeads = apollo.leads;
-          apolloCopyDraft = apollo.copyDraft;
-          apolloFallbackUsed = apollo.fallbackUsed;
-          personalizedFallback = null;
+        const replies = await generateDemandReplies(
+          baseContext,
+          rankedLeads.map((l) => ({
+            id: l.id,
+            title: l.title,
+            snippet: l.snippet,
+            url: l.url,
+          })),
+          openAiKey,
+          interpretationToReplySlice(i),
+        );
+        for (const r of replies) {
+          if (r.reply?.trim()) replyDrafts.push({ id: r.id, reply: r.reply.trim() });
         }
       } catch (e) {
-        console.warn("[landing-preview] Apollo preview failed", {
+        console.warn("[landing-preview] generateDemandReplies failed", {
           message: e instanceof Error ? e.message : String(e),
         });
       }
     }
   }
+
+  const personalizedFallback =
+    rankedLeads.length === 0 ? buildTemplatePersonalizedCard(i) : null;
 
   const payload: LandingPreviewResultResponse = {
     ok: true,
@@ -217,13 +272,6 @@ export async function POST(request: Request) {
     redditLeads: rankedLeads,
     replyDrafts,
     personalizedFallback,
-    ...(apolloLeads && apolloLeads.length > 0
-      ? {
-          apolloLeads,
-          apolloCopyDraft,
-          apolloFallbackUsed,
-        }
-      : {}),
   };
-  return NextResponse.json(payload);
+  return NextResponse.json(payload, { headers: demoSuccessHeaders(ip, demoCookie) });
 }

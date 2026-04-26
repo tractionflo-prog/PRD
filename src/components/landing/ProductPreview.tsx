@@ -1,8 +1,21 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
-import { ProductDemo } from "./ProductDemo";
 import { Section } from "./Section";
+
+const ProductDemo = dynamic(() =>
+  import("./ProductDemo").then((m) => ({ default: m.ProductDemo })),
+  {
+    ssr: true,
+    loading: () => (
+      <div
+        className="min-h-[260px] rounded-lg bg-slate-50/90 sm:min-h-[300px]"
+        aria-hidden
+      />
+    ),
+  },
+);
 
 export function ProductPreview() {
   const reduceMotion = useReducedMotion();
@@ -33,7 +46,7 @@ export function ProductPreview() {
 
       <div className="relative mx-auto mt-14 max-w-6xl sm:mt-16">
         <div
-          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[min(70%,28rem)] w-[min(92%,56rem)] -translate-x-1/2 -translate-y-1/2 rounded-[2.5rem] bg-gradient-to-r from-indigo-400/25 via-violet-400/20 to-blue-400/25 opacity-90 blur-3xl"
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[min(70%,28rem)] w-[min(92%,56rem)] -translate-x-1/2 -translate-y-1/2 rounded-[2.5rem] bg-gradient-to-r from-indigo-400/25 via-violet-400/20 to-blue-400/25 opacity-90 blur-2xl max-md:h-[min(50%,18rem)] max-md:w-[min(96%,24rem)] max-md:opacity-60 md:blur-3xl"
           aria-hidden
         />
 
@@ -42,7 +55,7 @@ export function ProductPreview() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-          className="relative overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100/80 p-1.5 shadow-[0_32px_80px_-40px_rgba(15,23,42,0.2),0_0_0_1px_rgba(255,255,255,0.8)_inset] ring-1 ring-slate-200/60 sm:rounded-2xl sm:p-2"
+          className="relative overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100/80 p-1.5 shadow-[0_20px_48px_-32px_rgba(15,23,42,0.14),0_0_0_1px_rgba(255,255,255,0.8)_inset] ring-1 ring-slate-200/60 max-md:shadow-[0_14px_36px_-24px_rgba(15,23,42,0.12),0_0_0_1px_rgba(255,255,255,0.75)_inset] sm:rounded-2xl sm:p-2 md:shadow-[0_32px_80px_-40px_rgba(15,23,42,0.2),0_0_0_1px_rgba(255,255,255,0.8)_inset]"
         >
           <div className="flex items-center gap-2 rounded-lg bg-white/90 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3">
             <div className="flex gap-1.5 pl-0.5" aria-hidden>
