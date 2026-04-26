@@ -70,7 +70,10 @@ export function Navbar() {
     };
   }, [isHome]);
 
-  const darkNav = isDemand;
+  /** Light hero at top of home: dark nav text. Past hero / demand: frosted dark bar + light text. */
+  const onDarkLanding = isDemand || (isHome && pastHero);
+  const solidDarkBar = isDemand || (isHome && pastHero);
+  const transparentHome = isHome && !pastHero;
 
   return (
     <motion.header
@@ -83,9 +86,11 @@ export function Navbar() {
       className={cn(
         "top-0 z-50 w-full border-b pt-[env(safe-area-inset-top,0px)] transition-[background-color,backdrop-filter,border-color,box-shadow,padding] duration-300",
         isHome ? "fixed" : "sticky",
-        darkNav
-          ? "border-white/5 bg-black/50 shadow-[0_10px_36px_-28px_rgba(0,0,0,0.78)] backdrop-blur-[12px]"
-          : "border-[#e2e8f0] bg-white/80 shadow-[0_8px_30px_-24px_rgba(15,23,42,0.06)] backdrop-blur-xl",
+        transparentHome
+          ? "border-transparent bg-transparent shadow-none"
+          : solidDarkBar
+            ? "border-white/10 bg-black/45 shadow-[0_12px_40px_-28px_rgba(0,0,0,0.85)] backdrop-blur-xl"
+            : "border-[#e2e8f0] bg-white/80 shadow-[0_8px_30px_-24px_rgba(15,23,42,0.06)] backdrop-blur-xl",
       )}
     >
       <nav
@@ -100,7 +105,7 @@ export function Navbar() {
           onClick={isDemand ? undefined : (e) => smoothHashNav(e, "overview")}
           className={cn(
             "min-h-11 min-w-11 shrink-0 py-2 text-[15px] font-semibold tracking-[-0.02em] sm:text-[16px]",
-            darkNav ? "text-white" : "text-[#0f172a]",
+            onDarkLanding ? "text-white" : "text-[#0f172a]",
           )}
         >
           {BRAND}
@@ -117,8 +122,8 @@ export function Navbar() {
                     onClick={(e) => smoothHashNav(e, link.hash)}
                     className={cn(
                       "group inline-flex min-h-11 items-center gap-2 rounded-md px-1 text-[13px] font-medium transition-colors sm:px-0 sm:text-[15px]",
-                      darkNav
-                        ? "text-white/85 can-hover:hover:text-white focus-visible:outline-white/40"
+                      onDarkLanding
+                        ? "text-white/80 can-hover:hover:text-white focus-visible:outline-white/40"
                         : "text-[#64748b] can-hover:hover:text-[#635bff] focus-visible:outline-[#635bff]/35",
                       "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
                     )}
@@ -126,9 +131,9 @@ export function Navbar() {
                     <Icon
                       className={cn(
                         "size-[18px] shrink-0 text-[#635bff] transition-colors motion-reduce:transition-none",
-                        darkNav &&
-                          "text-[#c4b5fd] group-hover:text-[#e9d5ff]",
-                        !darkNav && "group-hover:text-[#5851ea]",
+                        onDarkLanding &&
+                          "text-indigo-300 group-hover:text-indigo-100",
+                        !onDarkLanding && "group-hover:text-[#5851ea]",
                       )}
                       width={18}
                       height={18}
@@ -142,16 +147,16 @@ export function Navbar() {
           <ScrollCta
             href="/#join"
             className={cn(
-              "inline-flex h-11 max-w-full shrink-0 items-center gap-2 px-3 text-[13px] sm:h-10 sm:px-6 sm:text-[15px]",
-              isDemand && "ring-1 ring-white/20",
+              "inline-flex h-11 max-w-full shrink-0 items-center gap-2 px-3 text-[13px] sm:h-12 sm:px-6 sm:text-[15px]",
+              isDemand && solidDarkBar && "ring-1 ring-white/20",
             )}
-            variant={darkNav ? "subtle" : "primary"}
+            variant={isDemand && solidDarkBar ? "subtle" : "primary"}
             aria-label="Join waitlist — scroll to email form at bottom"
           >
             <IconSend
               className={cn(
                 "size-[18px] shrink-0 transition-colors",
-                darkNav ? "text-[#635bff]" : "text-white",
+                isDemand && solidDarkBar ? "text-indigo-300" : "text-white",
               )}
               width={18}
               height={18}

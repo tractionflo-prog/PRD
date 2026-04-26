@@ -1,12 +1,16 @@
 export { BeliefShift } from "./BeliefShift";
+export { CoreIdeaSection } from "./CoreIdeaSection";
+export { DemandLoudQuietSection } from "./DemandLoudQuietSection";
 export { EmailCapture } from "./EmailCapture";
 export { FadeUp } from "./FadeUp";
 export { FinalCta } from "./FinalCta";
+export { FounderFitSection } from "./FounderFitSection";
 export { Hero } from "./Hero";
 export { HeroDemandPreview } from "./HeroDemandPreview";
 export { HeroMockup } from "./HeroMockup";
 export { Navbar } from "./Navbar";
 export { PrimaryButton } from "./PrimaryButton";
+export { PositioningSection } from "./PositioningSection";
 export { ProblemSection } from "./ProblemSection";
 export { ProductPreview } from "./ProductPreview";
 export { ScrollCta } from "./ScrollCta";

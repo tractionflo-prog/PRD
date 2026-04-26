@@ -14,7 +14,8 @@ import {
   type PersonalizedFallbackCard,
   type ProblemInterpretationOk,
 } from "@/lib/demand/problem-interpreter";
-import type { DemandLead } from "@/lib/demand/types";
+import { fetchRankedApolloPreviewLeads } from "@/lib/demand/apollo-landing-preview";
+import type { ApolloPreviewLead, DemandLead } from "@/lib/demand/types";
 import { NextResponse } from "next/server";
 
 const MAX_RAW = 2000;
@@ -46,6 +47,10 @@ export type LandingPreviewResultResponse = {
   redditLeads: DemandLead[];
   replyDrafts: { id: string; reply: string }[];
   personalizedFallback: PersonalizedFallbackCard | null;
+  /** Present when Reddit had no matches and Apollo returned people. */
+  apolloLeads?: ApolloPreviewLead[];
+  apolloCopyDraft?: string;
+  apolloFallbackUsed?: boolean;
 };
 
 export type LandingPreviewResponse =
@@ -176,8 +181,31 @@ export async function POST(request: Request) {
     }
   }
 
-  const personalizedFallback =
+  let personalizedFallback =
     rankedLeads.length === 0 ? buildTemplatePersonalizedCard(i) : null;
+
+  let apolloLeads: ApolloPreviewLead[] | undefined;
+  let apolloCopyDraft: string | undefined;
+  let apolloFallbackUsed: boolean | undefined;
+
+  if (rankedLeads.length === 0) {
+    const apolloKey = process.env.APOLLO_API_KEY?.trim();
+    if (apolloKey) {
+      try {
+        const apollo = await fetchRankedApolloPreviewLeads(i, key, apolloKey);
+        if (apollo.leads.length > 0) {
+          apolloLeads = apollo.leads;
+          apolloCopyDraft = apollo.copyDraft;
+          apolloFallbackUsed = apollo.fallbackUsed;
+          personalizedFallback = null;
+        }
+      } catch (e) {
+        console.warn("[landing-preview] Apollo preview failed", {
+          message: e instanceof Error ? e.message : String(e),
+        });
+      }
+    }
+  }
 
   const payload: LandingPreviewResultResponse = {
     ok: true,
@@ -189,6 +217,13 @@ export async function POST(request: Request) {
     redditLeads: rankedLeads,
     replyDrafts,
     personalizedFallback,
+    ...(apolloLeads && apolloLeads.length > 0
+      ? {
+          apolloLeads,
+          apolloCopyDraft,
+          apolloFallbackUsed,
+        }
+      : {}),
   };
   return NextResponse.json(payload);
 }

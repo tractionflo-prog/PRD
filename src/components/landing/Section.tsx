@@ -27,7 +27,7 @@ export function Section({
     >
       <div
         className={cn(
-          "mx-auto w-full min-w-0 max-w-[1200px]",
+          "mx-auto w-full min-w-0 max-w-7xl",
           innerClassName,
         )}
       >

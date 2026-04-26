@@ -4,45 +4,54 @@ import { Section } from "./Section";
 
 const items = [
   {
-    text: "You’ve launched something",
+    title: "You’ve launched something",
+    description: "But the right people haven’t seen it yet.",
     Icon: IconRocket,
   },
   {
-    text: "You’re looking for your first users",
+    title: "You’re looking for first users",
+    description: "Not vanity traffic — real people with the problem.",
     Icon: IconUsers,
   },
   {
-    text: "You want signal before scaling",
+    title: "You want signal before scaling",
+    description: "Learn what resonates before spending more time or money.",
     Icon: IconCheck,
   },
 ] as const;
 
 export function WhoItsFor() {
   return (
-    <Section className="bg-[#f8fafc] py-20 sm:py-24 md:py-28">
-      <FadeUp>
-        <h2 className="max-w-[26rem] text-[2.1rem] font-semibold leading-[1.1] tracking-tight text-[#0f172a] sm:max-w-[30rem] sm:text-[2.3rem] lg:text-[2.45rem]">
+    <Section className="relative overflow-x-clip bg-gradient-to-b from-slate-50 to-slate-100/70 py-28 sm:py-28">
+      <div
+        className="pointer-events-none absolute right-1/4 top-0 h-56 w-72 rounded-full bg-indigo-100/25 blur-3xl"
+        aria-hidden
+      />
+      <FadeUp className="relative">
+        <h2 className="mx-auto max-w-2xl text-balance text-center text-4xl font-semibold leading-tight tracking-tight text-[#0f172a] sm:text-5xl">
           Built for founders who are still validating
         </h2>
+        <p className="mx-auto mt-5 max-w-2xl text-center text-lg leading-8 text-slate-600">
+          Fewer dashboards. More proof the problem is real — and who feels it.
+        </p>
       </FadeUp>
 
-      <div className="mx-auto mt-10 max-w-[980px] sm:mt-14">
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+      <div className="relative mx-auto mt-12 max-w-6xl">
+        <ul className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {items.map((item, i) => {
             const Icon = item.Icon;
             return (
-              <li key={item.text}>
+              <li key={item.title}>
                 <FadeUp delay={0.09 * i}>
-                  <div
-                    className={`group flex h-full items-center gap-3.5 rounded-2xl border border-[#e2e8f0] bg-white px-5 py-4 shadow-[0_24px_80px_-52px_rgba(15,23,42,0.1)] transition-[transform,box-shadow] duration-200 ease-out can-hover:hover:-translate-y-0.5 can-hover:hover:shadow-[0_28px_80px_-48px_rgba(15,23,42,0.12)] sm:px-5 sm:py-4 ${
-                      i === 1 || i === 2 ? "sm:scale-[1.02]" : ""
-                    }`}
-                  >
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[rgba(99,91,255,0.08)] text-[#635bff] ring-1 ring-[#635bff]/10 transition-transform duration-200 ease-out can-hover:group-hover:-translate-y-0.5">
+                  <div className="group h-full rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm transition-[transform,box-shadow] duration-200 ease-out can-hover:-translate-y-0.5 can-hover:shadow-md">
+                    <span className="mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[rgba(99,91,255,0.08)] text-[#635bff] ring-1 ring-[#635bff]/10">
                       <Icon className="h-6 w-6" />
                     </span>
-                    <p className="text-[15px] font-semibold leading-snug text-[#0f172a] transition-colors duration-200 ease-out can-hover:group-hover:text-[#0f172a]">
-                      {item.text}
+                    <p className="text-[18px] font-semibold leading-snug text-[#0f172a]">
+                      {item.title}
+                    </p>
+                    <p className="mt-2 text-[15px] leading-7 text-slate-600">
+                      {item.description}
                     </p>
                   </div>
                 </FadeUp>
@@ -51,7 +60,7 @@ export function WhoItsFor() {
           })}
         </ul>
         <FadeUp delay={0.14}>
-          <p className="mt-10 max-w-[36rem] text-pretty text-[15px] font-medium leading-relaxed text-[#64748b] sm:mt-12 sm:text-[16px]">
+          <p className="mt-8 text-center text-sm font-medium text-slate-500">
             This is designed for that stage.
           </p>
         </FadeUp>

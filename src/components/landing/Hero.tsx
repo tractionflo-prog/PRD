@@ -5,55 +5,84 @@ export function Hero() {
   return (
     <section
       id="overview"
-      className="relative isolate w-full min-w-0 scroll-mt-32 overflow-x-clip overflow-hidden bg-white pb-12 pt-[calc(env(safe-area-inset-top,0px)+4.25rem)] max-md:pb-14 sm:scroll-mt-24 sm:pb-24 sm:pt-[calc(env(safe-area-inset-top,0px)+4.5rem)] md:pb-28 md:pt-24"
+      className="relative isolate min-h-[92svh] w-full min-w-0 scroll-mt-32 overflow-x-clip overflow-hidden bg-[#fafafa] pb-20 pt-[calc(env(safe-area-inset-top,0px)+4.25rem)] sm:scroll-mt-24 sm:pb-28 sm:pt-[calc(env(safe-area-inset-top,0px)+4.5rem)] md:pt-24"
     >
-      <div className="hero-gradient-animated absolute inset-0 min-h-full" aria-hidden />
+      {/* Layered backdrop */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#fafbff_42%,#f4f7fc_100%)]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -left-[20%] top-0 h-[min(28rem,70vw)] w-[min(28rem,70vw)] rounded-full bg-indigo-400/18 blur-3xl"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -right-[15%] top-[10%] h-[min(24rem,65vw)] w-[min(26rem,68vw)] rounded-full bg-violet-400/14 blur-3xl"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-[min(100%,36rem)] -translate-x-1/2 rounded-full bg-sky-300/10 blur-3xl"
+        aria-hidden
+      />
+      <div className="hero-premium-grid pointer-events-none absolute inset-0" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.04%22/%3E%3C/svg%3E')] opacity-[0.35] mix-blend-multiply"
+        aria-hidden
+      />
+
+      <div className="hero-gradient-animated absolute inset-0 min-h-full opacity-50" aria-hidden />
       <div className="hero-ribbons" aria-hidden>
         <div className="hero-ribbon hero-ribbon-1" />
         <div className="hero-ribbon hero-ribbon-2" />
         <div className="hero-ribbon hero-ribbon-3" />
       </div>
 
-      <div className="relative z-[1] mx-auto w-full min-w-0 max-w-[1200px] px-5 py-8 sm:px-8 sm:py-16 md:py-20 lg:px-10">
-        <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center md:max-w-[44rem] md:items-start md:text-left">
+      {/* Floating preview cards (decorative) */}
+      <div
+        className="hero-float-preview pointer-events-none absolute left-[4%] top-[22%] z-0 hidden max-w-[200px] rounded-xl border border-white/70 bg-white/75 px-3 py-2.5 shadow-[0_18px_40px_-22px_rgba(15,23,42,0.18)] backdrop-blur-md lg:left-[6%] lg:block xl:max-w-[220px]"
+        aria-hidden
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-indigo-600/90">Thread</p>
+        <p className="mt-1 text-[11px] leading-snug text-slate-600">
+          &ldquo;Anyone else drowning in follow-ups after demos?&rdquo;
+        </p>
+      </div>
+      <div
+        className="hero-float-preview-alt pointer-events-none absolute right-[3%] top-[38%] z-0 hidden max-w-[190px] rounded-xl border border-white/70 bg-white/70 px-3 py-2.5 shadow-[0_16px_36px_-20px_rgba(99,102,241,0.25)] backdrop-blur-md lg:right-[5%] lg:block"
+        aria-hidden
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Suggested</p>
+        <p className="mt-1 text-[11px] font-medium leading-snug text-slate-800">Open with context, not a pitch.</p>
+      </div>
+
+      <div className="relative z-[1] mx-auto flex min-h-[min(72vh,52rem)] w-full max-w-5xl flex-col justify-center px-6 sm:px-10 lg:px-12">
+        <div className="mx-auto w-full max-w-3xl text-center md:max-w-[44rem] md:text-left">
           <FadeUp preset="hero">
-            <p className="inline-flex items-center gap-2 rounded-full border border-[#e2e8f0] bg-white/90 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#64748b] shadow-[0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-sm sm:text-[12px] md:self-start">
-              Demand → conversations
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-600 sm:text-xs">
+              Signal before scale
             </p>
           </FadeUp>
 
-          <FadeUp preset="hero" delay={0.05} className="mt-4 sm:mt-7 md:mt-6">
-            <h1 className="text-balance text-[1.85rem] font-bold leading-[1.06] tracking-tight text-[#0f172a] max-md:max-w-[20ch] sm:text-[2.5rem] sm:leading-[1.06] md:max-w-none md:text-[2.85rem] md:leading-[1.04]">
-              <span className="md:hidden">Launch where people already care</span>
-              <span className="hidden md:inline">Stop launching into silence</span>
+          <FadeUp preset="hero" delay={0.06} className="mt-5 sm:mt-6">
+            <h1 className="text-balance text-[clamp(2.75rem,6vw,4.5rem)] font-semibold leading-[1.05] tracking-tight text-slate-900">
+              Stop launching into silence.
             </h1>
           </FadeUp>
 
-          <FadeUp preset="hero" delay={0.1} className="mt-3 max-w-2xl sm:mt-6 md:mt-5">
-            <p className="text-pretty text-[14px] leading-snug text-[#64748b] max-md:max-w-[28ch] sm:text-[17px] sm:leading-relaxed md:mx-0 md:max-w-[38rem]">
-              <span className="md:hidden">
-                Spot real demand in conversations—or start sharper ones when it&apos;s quiet.
-              </span>
-              <span className="hidden md:inline">
-                Find people already talking about the problem you solve — or start the right
-                conversations when demand isn&apos;t visible.
-              </span>
+          <FadeUp preset="hero" delay={0.1} className="mt-5 max-w-2xl sm:mt-6">
+            <p className="text-pretty text-lg leading-relaxed text-slate-600 sm:text-xl">
+              Find people already talking about your problem — or start the right conversation when no
+              one is.
             </p>
           </FadeUp>
 
-          <FadeUp preset="hero" delay={0.14} className="mt-4 hidden sm:mt-7 md:mt-6 md:block">
-            <p className="text-[13px] font-medium text-[#64748b] sm:text-[14px]">
-              Describe the problem, not just the product.
-            </p>
-          </FadeUp>
-
-          <FadeUp preset="hero" delay={0.18} className="mt-5 w-full max-w-2xl sm:mt-10 md:mt-8 md:self-start">
+          <FadeUp preset="hero" delay={0.14} className="mt-8 w-full sm:mt-10">
             <HeroDemandPreview />
           </FadeUp>
 
-          <FadeUp preset="hero" delay={0.22} className="mt-4 hidden max-w-2xl md:mt-5 md:block">
-            <p className="text-center text-[12px] font-medium leading-relaxed text-[#94a3b8] sm:text-[13px] md:text-left">
-              No spam • Nothing sends automatically • You stay in control
+          <FadeUp preset="hero" delay={0.18} className="mt-6">
+            <p className="text-center text-sm font-medium text-slate-500 md:text-left">
+              No spam · No auto-send · You stay in control
             </p>
           </FadeUp>
         </div>

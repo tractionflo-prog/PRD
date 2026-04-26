@@ -1,7 +1,8 @@
-import { FadeUp } from "./FadeUp";
+"use client";
+
+import { motion, useReducedMotion } from "framer-motion";
 import { IconCheck, IconDoc, IconUsers } from "./icons";
 import { Section } from "./Section";
-import { SurfaceCard } from "./SurfaceCard";
 
 const cards = [
   {
@@ -13,57 +14,81 @@ const cards = [
   {
     n: "02",
     title: "We find demand signals",
-    text: "We surface real conversations when people are already asking — and show people likely facing the problem when demand is quiet.",
+    text: "We surface real conversations when people are already asking — and likely fits when demand is quiet.",
     icon: IconUsers,
   },
   {
     n: "03",
     title: "You start the conversation",
-    text: "We draft thoughtful conversation starters. You approve, edit, and send manually.",
+    text: "We draft thoughtful starters. You approve, edit, and send manually.",
     icon: IconCheck,
   },
 ] as const;
 
 export function ValueSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <Section
       id="process"
-      className="scroll-mt-24 bg-white py-20 sm:scroll-mt-20 sm:py-24 md:py-28 lg:py-32"
+      className="scroll-mt-24 border-t border-slate-200/50 bg-[#fafbff] py-24 sm:scroll-mt-20 sm:py-28 md:py-36"
     >
-      <FadeUp>
-        <h2 className="max-w-[40rem] text-balance text-[2rem] font-semibold leading-[1.12] tracking-tight text-[#0f172a] sm:text-[2.35rem] lg:text-[2.65rem]">
-          You find conversations — or you create them
-        </h2>
-      </FadeUp>
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_40%_at_50%_0%,rgba(99,102,241,0.06),transparent_65%)]"
+        aria-hidden
+      />
 
-      <div className="mt-8 h-px w-full max-w-[40rem] bg-[#e2e8f0]" />
+      <div className="relative">
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-12%" }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="max-w-3xl"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600/90">How it works</p>
+          <h2 className="mt-4 text-balance text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl md:text-[2.65rem] md:leading-[1.1]">
+            From what you built to a thread you can open.
+          </h2>
+        </motion.div>
 
-      <div className="relative mt-10 grid gap-6 sm:grid-cols-3 sm:gap-7">
-        {cards.map((card, i) => {
-          const Icon = card.icon;
-          return (
-            <FadeUp key={card.n} delay={0.08 * i}>
-              <SurfaceCard className="group relative z-[1] flex h-full flex-col overflow-hidden border-[#e2e8f0] p-0 shadow-[0_24px_80px_-48px_rgba(15,23,42,0.12)] transition-[transform,box-shadow] duration-200 ease-out can-hover:hover:-translate-y-0.5 can-hover:hover:shadow-[0_28px_90px_-44px_rgba(15,23,42,0.14)]">
-                <div className="px-8 pb-9 pt-9 sm:px-9 sm:pb-10 sm:pt-10">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[rgba(99,91,255,0.08)] text-[#635bff] ring-1 ring-[#635bff]/10">
-                      <Icon className="h-8 w-8" />
-                    </div>
-                    <span className="pt-1 text-[12px] font-medium tabular-nums tracking-[0.12em] text-[#94a3b8]">
-                      {card.n}
-                    </span>
+        <div className="mt-14 grid gap-5 sm:mt-16 sm:grid-cols-3 sm:gap-6 lg:gap-8">
+          {cards.map((card, i) => {
+            const Icon = card.icon;
+            return (
+              <motion.div
+                key={card.n}
+                initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-10%" }}
+                transition={{
+                  duration: 0.55,
+                  delay: reduceMotion ? 0 : 0.1 * i,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                whileHover={reduceMotion ? undefined : { y: -6 }}
+                className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/90 p-7 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.14),0_0_0_1px_rgba(15,23,42,0.04)] ring-1 ring-slate-200/40 backdrop-blur-md sm:p-8"
+              >
+                <div
+                  className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br from-indigo-400/15 to-violet-400/10 blur-2xl transition-opacity duration-500 group-hover:opacity-100 sm:h-40 sm:w-40"
+                  aria-hidden
+                />
+                <div className="relative flex items-start justify-between gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 text-indigo-600 ring-1 ring-indigo-500/15">
+                    <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="mt-8 text-[1.125rem] font-semibold leading-snug tracking-tight text-[#0f172a] sm:text-[1.2rem]">
-                    {card.title}
-                  </h3>
-                  <p className="mt-2.5 text-[15px] leading-relaxed text-[#64748b] sm:text-[16px]">
-                    {card.text}
-                  </p>
+                  <span className="text-xs font-semibold tabular-nums tracking-widest text-slate-400">
+                    {card.n}
+                  </span>
                 </div>
-              </SurfaceCard>
-            </FadeUp>
-          );
-        })}
+                <h3 className="relative mt-8 text-lg font-semibold leading-snug tracking-tight text-slate-900">
+                  {card.title}
+                </h3>
+                <p className="relative mt-3 flex-1 text-[15px] leading-relaxed text-slate-600">{card.text}</p>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </Section>
   );

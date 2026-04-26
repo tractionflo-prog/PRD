@@ -65,3 +65,16 @@ export type DemandReplyItem = {
 export type DemandRepliesResponse = {
   replies: DemandReplyItem[];
 };
+
+/** Apollo people shown on the landing preview when Reddit has no matches. */
+export type ApolloPreviewLead = {
+  id: string;
+  name: string;
+  title: string;
+  company: string;
+  location: string;
+  email: string;
+  linkedin_url: string;
+  whyMatch: string;
+  replyDraft?: string;
+};

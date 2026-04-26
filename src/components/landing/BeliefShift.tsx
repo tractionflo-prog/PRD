@@ -2,75 +2,70 @@ import { FadeUp } from "./FadeUp";
 import { IconChat, IconRadar, IconTrend } from "./icons";
 import { Section } from "./Section";
 
-const points = [
-  {
-    title: "Real users",
-    icon: IconChat,
-  },
-  {
-    title: "Real feedback",
-    icon: IconRadar,
-  },
-  {
-    title: "Real momentum",
-    icon: IconTrend,
-  },
-] as const;
-
 export function BeliefShift() {
   return (
-    <Section className="bg-white py-20 sm:py-24 md:py-28 lg:py-32">
-      <FadeUp>
-        <h2 className="max-w-[36rem] text-balance text-[2.2rem] font-semibold leading-[1.07] tracking-tight text-[#0f172a] sm:text-[2.55rem] lg:text-[2.85rem]">
-          Early growth comes from conversations, not features
-        </h2>
-        <div className="mt-6 max-w-[38rem] text-pretty text-[16px] leading-relaxed text-[#64748b] sm:text-[1.02rem]">
-          <p className="font-normal">Before scaling:</p>
-          <ul className="mt-3 list-none space-y-2 pl-0">
-            <li className="flex gap-2">
-              <span className="text-[#cbd5e1]" aria-hidden>
-                —
-              </span>
-              <span>you need clarity</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-[#cbd5e1]" aria-hidden>
-                —
-              </span>
-              <span>you need feedback</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-[#cbd5e1]" aria-hidden>
-                —
-              </span>
-              <span>you need signal</span>
-            </li>
-          </ul>
-          <p className="mt-6 font-medium text-[#0f172a]">Tractionflo helps you get that sooner.</p>
-        </div>
+    <Section className="relative overflow-x-clip bg-white py-28 sm:py-28">
+      <div
+        className="pointer-events-none absolute left-0 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-slate-200/30 blur-3xl"
+        aria-hidden
+      />
+      <div className="relative grid items-start gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-14">
+        <FadeUp>
+          <h2 className="max-w-[34rem] text-balance text-4xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-5xl">
+            Early growth comes from conversations, not features
+          </h2>
+          <div className="mt-6 max-w-[34rem] text-pretty text-base leading-8 text-slate-600 sm:text-lg">
+            <p>Before scaling, you need:</p>
+            <p className="mt-3 font-medium text-slate-950">
+              clarity
+              <br />
+              feedback
+              <br />
+              signal
+            </p>
+            <p className="mt-6 font-medium text-slate-950">Real conversations get you there faster.</p>
+          </div>
+        </FadeUp>
 
-        <div className="mt-14 grid gap-5 sm:mt-16 sm:grid-cols-3 sm:gap-6">
-          {points.map((item, i) => {
+        <div className="grid gap-4">
+          {[
+            {
+              title: "Real users",
+              description: "Find people close enough to the problem to care.",
+              icon: IconChat,
+            },
+            {
+              title: "Real feedback",
+              description: "Start conversations that teach you what to build next.",
+              icon: IconRadar,
+            },
+            {
+              title: "Real momentum",
+              description: "Turn silent launches into visible progress.",
+              icon: IconTrend,
+            },
+          ].map((item, i) => {
             const Icon = item.icon;
             return (
-              <FadeUp key={item.title} delay={0.09 * i} className="h-full">
-                <div
-                  className={`flex h-full flex-col rounded-2xl border border-[#e2e8f0] bg-white px-6 py-8 shadow-[0_24px_80px_-52px_rgba(15,23,42,0.12)] transition-[transform,box-shadow] duration-200 ease-out can-hover:hover:-translate-y-0.5 can-hover:hover:shadow-[0_28px_80px_-48px_rgba(15,23,42,0.14)] sm:px-7 sm:py-9 ${
-                    i === 1 ? "sm:scale-[1.02]" : ""
-                  }`}
-                >
-                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-[rgba(99,91,255,0.08)] text-[#635bff] ring-1 ring-[#635bff]/10">
-                    <Icon className="h-[34px] w-[34px]" />
+              <FadeUp key={item.title} delay={0.08 * i} className="h-full">
+                <div className="flex h-full rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm transition-[transform,box-shadow] duration-200 ease-out can-hover:-translate-y-0.5 can-hover:shadow-md">
+                  <div className="mr-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[rgba(99,91,255,0.08)] text-[#635bff] ring-1 ring-[#635bff]/10">
+                    <Icon className="h-6 w-6" />
                   </div>
-                  <p className="text-[1.0625rem] font-semibold leading-snug tracking-tight text-[#0f172a] sm:text-lg">
-                    {item.title}
-                  </p>
+                  <div>
+                    <p className="text-lg font-semibold leading-snug tracking-tight text-[#0f172a]">
+                      {item.title}
+                    </p>
+                    <p className="mt-1.5 text-[15px] leading-7 text-[#64748b]">
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
               </FadeUp>
             );
           })}
         </div>
-      </FadeUp>
+      </div>
     </Section>
   );
 }
