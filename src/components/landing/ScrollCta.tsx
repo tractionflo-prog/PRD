@@ -32,7 +32,7 @@ export function ScrollCta({
         if (el && window.location.pathname === "/") {
           e.preventDefault();
           el.scrollIntoView({
-            behavior: "smooth",
+            behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
             block: "start",
             inline: "nearest",
           });

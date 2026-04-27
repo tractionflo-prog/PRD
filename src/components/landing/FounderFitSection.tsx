@@ -4,8 +4,8 @@ import { motion, useReducedMotion } from "framer-motion";
 
 const items = [
   { title: "You’ve launched something", line: "A product, a beta, or a clear wedge you believe in." },
-  { title: "You’re looking for first users", line: "Not vanity traffic — people who might actually care." },
-  { title: "You want signal before scaling", line: "Calm next steps instead of guessing in the dark." },
+  { title: "You want real users", line: "Not vanity traffic — people who might actually care." },
+  { title: "You struggle with consistency", line: "You know what to do, but it slips behind product work." },
 ] as const;
 
 export function FounderFitSection() {

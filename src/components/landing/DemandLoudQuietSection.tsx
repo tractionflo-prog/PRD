@@ -46,8 +46,8 @@ function FloatCard({
   const reduceMotion = useReducedMotion();
   const loudTone =
     tone === "loud"
-      ? "bg-white/90 shadow-[0_20px_50px_-24px_rgba(99,102,241,0.25),0_0_0_1px_rgba(99,102,241,0.08)] ring-1 ring-indigo-500/10"
-      : "bg-white/85 shadow-[0_18px_44px_-22px_rgba(15,23,42,0.12),0_0_0_1px_rgba(15,23,42,0.04)] ring-1 ring-slate-200/60";
+      ? "bg-white/95 shadow-[0_16px_40px_-24px_rgba(99,102,241,0.2),0_0_0_1px_rgba(99,102,241,0.08)] ring-1 ring-indigo-500/10"
+      : "bg-white/95 shadow-[0_14px_34px_-22px_rgba(15,23,42,0.1),0_0_0_1px_rgba(15,23,42,0.04)] ring-1 ring-slate-200/60";
 
   return (
     <motion.div
@@ -56,7 +56,7 @@ function FloatCard({
       viewport={{ once: true, margin: "-8%" }}
       transition={{ duration: 0.55, delay: reduceMotion ? 0 : delay, ease: [0.22, 1, 0.36, 1] }}
       whileHover={reduceMotion ? undefined : { y: -4 }}
-      className={`rounded-2xl px-4 py-3.5 backdrop-blur-none sm:px-5 sm:py-4 md:backdrop-blur-md ${loudTone}`}
+      className={`rounded-2xl px-4 py-4 backdrop-blur-none sm:px-5 md:backdrop-blur-md ${loudTone}`}
     >
       <p className="text-[11px] font-semibold uppercase tracking-wide text-indigo-600/90">{item.name}</p>
       <p className="mt-1.5 text-sm font-medium leading-snug text-slate-900 sm:text-[15px]">
@@ -73,7 +73,7 @@ export function DemandLoudQuietSection() {
   return (
     <section
       id="demand"
-      className="relative scroll-mt-24 overflow-hidden bg-[#f6f7fb] py-24 sm:scroll-mt-20 sm:py-32 md:py-36"
+      className="relative scroll-mt-24 overflow-hidden bg-[#f7f8fc] py-20 sm:scroll-mt-20 sm:py-28 md:py-32"
     >
       <div
         className="pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-slate-200/80 to-transparent md:block"
@@ -98,11 +98,11 @@ export function DemandLoudQuietSection() {
         >
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Demand</p>
           <h2 className="mt-4 text-balance text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-            Loud threads and quiet signal — in one view.
+            Real conversations. Real opportunities.
           </h2>
         </motion.div>
 
-        <div className="mt-16 grid gap-12 md:mt-20 md:grid-cols-2 md:gap-10 lg:gap-16">
+        <div className="mt-14 grid gap-10 md:mt-16 md:grid-cols-2 md:gap-8 lg:gap-12">
           <div className="relative md:pr-6">
             <motion.p
               initial={reduceMotion ? false : { opacity: 0 }}
