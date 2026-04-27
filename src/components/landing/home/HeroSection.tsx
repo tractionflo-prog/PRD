@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { PrimaryButton } from "@/components/landing/PrimaryButton";
 import { Section } from "@/components/landing/Section";
 import { FadeUp } from "@/components/landing/FadeUp";
@@ -50,10 +49,7 @@ export function HeroSection() {
       <div className="relative mx-auto grid min-w-0 max-w-6xl items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.02fr)] lg:items-start lg:gap-x-8 lg:gap-y-6">
         <div className="min-w-0 max-w-xl lg:max-w-[36rem] lg:pt-2">
           <FadeUp preset="hero">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-600/90">Tractionflo</p>
-          </FadeUp>
-          <FadeUp preset="hero" delay={0.04}>
-            <h1 className="mt-4 text-balance text-[clamp(1.75rem,5.5vw+0.65rem,4.85rem)] font-semibold leading-[1.05] tracking-[-0.038em] text-slate-900 sm:leading-[1.02]">
+            <h1 className="text-balance text-[clamp(1.75rem,5.5vw+0.65rem,4.85rem)] font-semibold leading-[1.05] tracking-[-0.038em] text-slate-900 sm:leading-[1.02]">
               No one is seeing your product.
             </h1>
           </FadeUp>
@@ -71,12 +67,12 @@ export function HeroSection() {
                   Join early access
                 </PrimaryButton>
               </a>
-              <Link
-                href="/demo"
+              <a
+                href="#process"
                 className="inline-flex h-11 items-center justify-center rounded-full px-4 text-[15px] font-medium text-indigo-700 transition-colors duration-200 hover:text-indigo-600"
               >
                 See how it works
-              </Link>
+              </a>
             </div>
             <p className="mt-5 max-w-md text-[15px] leading-relaxed text-slate-600">
               <span className="font-semibold text-slate-900">10 people are already waiting.</span>{" "}
