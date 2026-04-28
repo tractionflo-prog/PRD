@@ -12,6 +12,7 @@ const PER_QUERY_LIMIT = 60;
 const MIN_SCORE = 44;
 const HIGH_SCORE = 76;
 const MIN_VISIBLE_ITEMS = 10;
+const FEED_TIMEOUT_MS = 8_500;
 
 const QUERY_SET = [
   "how do you manage",
@@ -429,15 +430,30 @@ export async function getPublicOpportunitiesFeed(): Promise<{
   unavailable?: true;
   debugEmptyReason?: string;
 }> {
-  const out = await runFeedPipeline();
-  return {
-    items: out.items,
-    updatedAt: new Date().toISOString(),
-    ...(out.unavailable ? { unavailable: true as const } : {}),
-    ...(IS_DEV && out.items.length === 0
-      ? { debugEmptyReason: out.unavailable ? "provider_unavailable" : "filtered_out_by_quality" }
-      : {}),
-  };
+  try {
+    const out = await Promise.race([
+      runFeedPipeline(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("feed_timeout")), FEED_TIMEOUT_MS),
+      ),
+    ]);
+    return {
+      items: out.items,
+      updatedAt: new Date().toISOString(),
+      ...(out.unavailable ? { unavailable: true as const } : {}),
+      ...(IS_DEV && out.items.length === 0
+        ? { debugEmptyReason: out.unavailable ? "provider_unavailable" : "filtered_out_by_quality" }
+        : {}),
+    };
+  } catch (error) {
+    console.warn("[opportunities] feed fallback", error instanceof Error ? error.message : String(error));
+    return {
+      items: [],
+      updatedAt: new Date().toISOString(),
+      unavailable: true,
+      ...(IS_DEV ? { debugEmptyReason: "pipeline_error_or_timeout" } : {}),
+    };
+  }
 }
 
 export async function getPublicOpportunitiesFeedDebug(): Promise<OpportunitiesDebugSnapshot> {
