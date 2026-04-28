@@ -9,7 +9,7 @@ const inboxRows = [
 
 function statusTone(status: (typeof inboxRows)[number]["status"]) {
   if (status === "replied") return "bg-emerald-100 text-emerald-700";
-  if (status === "seen") return "bg-indigo-100 text-indigo-700";
+  if (status === "seen") return "bg-slate-100 text-slate-600";
   return "bg-amber-100 text-amber-700";
 }
 
@@ -24,7 +24,7 @@ export function LiveDemoSection() {
             <div className="mt-2.5 space-y-2">
               {inboxRows.map((row) => (
                 <div key={row.name} className="flex items-center justify-between rounded-xl bg-white px-2.5 py-2 ring-1 ring-slate-200/70">
-                  <p className="text-[13px] font-medium text-slate-700">{row.name}</p>
+                  <p className="text-[13px] font-medium text-slate-900">{row.name}</p>
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${statusTone(row.status)}`}>
                     {row.status}
                   </span>
@@ -38,7 +38,7 @@ export function LiveDemoSection() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Leads</p>
               <div className="mt-2.5 space-y-2">
                 {["Landlord founder", "SaaS PMM", "Ops lead"].map((lead) => (
-                  <div key={lead} className="rounded-xl bg-white px-2.5 py-2 text-[12px] text-slate-700 ring-1 ring-slate-200/70">
+                  <div key={lead} className="rounded-xl bg-white px-2.5 py-2 text-[12px] font-medium text-slate-800 ring-1 ring-slate-200/70">
                     {lead}
                   </div>
                 ))}

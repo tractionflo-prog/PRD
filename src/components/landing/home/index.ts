@@ -1,4 +1,5 @@
 export { HeroSection } from "./HeroSection";
+export { BeforeAfterSection } from "./BeforeAfterSection";
 export { LiveDemoSection } from "./LiveDemoSection";
 export { FeatureStrip } from "./FeatureStrip";
 export { ProblemHowItWorks } from "./ProblemHowItWorks";

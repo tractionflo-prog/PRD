@@ -292,30 +292,30 @@ body {
   @keyframes homeFloatWrapA {
     0%,
     100% {
-      transform: translateY(0) rotate(-4deg);
+      transform: translateY(0) rotate(-3deg);
     }
     50% {
-      transform: translateY(-6px) rotate(-3.4deg);
+      transform: translateY(-5px) rotate(-2.5deg);
     }
   }
 
   @keyframes homeFloatWrapB {
     0%,
     100% {
-      transform: translateY(0) rotate(2.8deg);
+      transform: translateY(0) rotate(2deg);
     }
     50% {
-      transform: translateY(5px) rotate(2.2deg);
+      transform: translateY(4px) rotate(1.55deg);
     }
   }
 
   @keyframes homeFloatWrapC {
     0%,
     100% {
-      transform: translateY(0) rotate(-3deg);
+      transform: translateY(0) rotate(-1deg);
     }
     50% {
-      transform: translateY(-5px) rotate(-2.5deg);
+      transform: translateY(-4px) rotate(-0.65deg);
     }
   }
 
@@ -369,11 +369,11 @@ body {
   }
 }
 
-/* Hero: stacked cards <768px — no float drift (layout + perf) */
-@media (max-width: 767px) {
-  .hero-visual .home-float-wrap-a,
-  .hero-visual .home-float-wrap-b,
-  .hero-visual .home-float-wrap-c {
+/* Hero: stacked cards <lg — no float drift (layout + perf) */
+@media (max-width: 1023px) {
+  .hero-float-stack .home-float-wrap-a,
+  .hero-float-stack .home-float-wrap-b,
+  .hero-float-stack .home-float-wrap-c {
     animation: none !important;
   }
 }

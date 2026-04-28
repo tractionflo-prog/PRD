@@ -45,7 +45,7 @@ const walkthroughSteps: readonly {
     preview: (
       <div className="flex flex-wrap gap-1">
         {["r/landlords", "Indie Hackers", "X"].map((label) => (
-          <span key={label} className="rounded-full border border-indigo-100/90 bg-indigo-50/80 px-2 py-0.5 text-[8px] font-semibold text-indigo-900">
+          <span key={label} className="rounded-full border border-slate-200/90 bg-slate-50/90 px-2 py-0.5 text-[8px] font-semibold text-slate-800">
             {label}
           </span>
         ))}
@@ -62,7 +62,7 @@ const walkthroughSteps: readonly {
     subtitle: "You approve, edit, copy, and send.",
     Icon: IconSend,
     preview: (
-      <div className="rounded-md border border-indigo-100/80 bg-indigo-50/50 px-2 py-1.5">
+      <div className="rounded-md border border-slate-200/80 bg-slate-50/60 px-2 py-1.5">
         <p className="text-[8px] leading-snug text-slate-700">&ldquo;Saw your post — built something for this.&rdquo;</p>
       </div>
     ),
@@ -88,7 +88,7 @@ function MessyToolbarIcon({ Icon, drift }: { Icon: SvgIcon; drift: "a" | "b" | "
 
 function TractionfloFlowPath() {
   return (
-    <div className="relative mt-5 rounded-xl border border-indigo-100/80 bg-white/50 px-3 py-4 backdrop-blur-sm">
+    <div className="relative mt-5 rounded-xl border border-slate-200/80 bg-white/50 px-3 py-4 backdrop-blur-sm">
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl opacity-50" aria-hidden>
         <div className="compare-flow-shimmer-bar absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-violet-200/40 to-transparent" />
       </div>
@@ -148,7 +148,7 @@ function TractionfloFlowPath() {
           <p className="text-[9px] font-semibold text-slate-800">3 replies</p>
         </div>
       </div>
-      <p className="relative mt-3 text-center text-[10px] font-semibold text-indigo-700">Done in 10 minutes</p>
+      <p className="relative mt-3 text-center text-[10px] font-semibold text-slate-600">Done in 10 minutes</p>
     </div>
   );
 }
@@ -177,7 +177,7 @@ function WalkthroughConnector({ variant, gradId }: { variant: "horizontal" | "ve
             style={{ strokeDasharray: "10 14" }}
           />
         </svg>
-        <IconArrowRight className="pointer-events-none absolute right-0 top-[0.85rem] h-3.5 w-3.5 text-indigo-400 drop-shadow-sm" />
+        <IconArrowRight className="pointer-events-none absolute right-0 top-[0.85rem] h-3.5 w-3.5 text-slate-400 drop-shadow-sm" />
       </div>
     );
   }
@@ -203,7 +203,7 @@ function WalkthroughConnector({ variant, gradId }: { variant: "horizontal" | "ve
           style={{ strokeDasharray: "10 14" }}
         />
       </svg>
-      <IconArrowRight className="absolute bottom-0.5 h-3.5 w-3.5 rotate-90 text-indigo-400" />
+      <IconArrowRight className="absolute bottom-0.5 h-3.5 w-3.5 rotate-90 text-slate-400" />
     </div>
   );
 }
@@ -226,7 +226,7 @@ function WalkthroughStepCard({
   return (
     <article
       tabIndex={0}
-      className="group relative z-10 flex w-full max-w-[17.5rem] flex-col rounded-2xl border border-indigo-100/70 bg-white/90 p-3 shadow-[0_12px_40px_-28px_rgba(79,70,229,0.35)] ring-1 ring-white/90 outline-none transition-[transform,box-shadow,border-color] duration-300 ease-out focus-visible:ring-2 focus-visible:ring-indigo-400/80 md:max-w-none md:flex-1 md:p-3.5 [@media(hover:hover)]:hover:z-20 [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:border-indigo-200 [@media(hover:hover)]:hover:shadow-[0_28px_56px_-24px_rgba(99,102,241,0.38)]"
+      className="group relative z-10 flex w-full max-w-[17.5rem] flex-col rounded-2xl border border-slate-200/80 bg-white/90 p-3 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.08)] ring-1 ring-white/90 outline-none transition-[transform,box-shadow,border-color] duration-300 ease-out focus-visible:ring-2 focus-visible:ring-slate-400/70 md:max-w-none md:flex-1 md:p-3.5 [@media(hover:hover)]:hover:z-20 [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:border-slate-300 [@media(hover:hover)]:hover:shadow-[0_28px_56px_-24px_rgba(15,23,42,0.12)]"
     >
       <div
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
@@ -241,12 +241,12 @@ function WalkthroughStepCard({
         </div>
         <div className="min-w-0 pt-0.5">
           <h3 className="text-left text-[11px] font-semibold leading-snug tracking-tight text-slate-900 sm:text-[12px]">
-            <span className="tabular-nums text-indigo-600">{String(step).padStart(2, "0")}</span>
+            <span className="tabular-nums text-slate-500">{String(step).padStart(2, "0")}</span>
             <span className="text-slate-400"> — </span>
             {title}
           </h3>
           <p className="mt-1 text-left text-[10px] font-medium leading-snug text-slate-600">{subtitle}</p>
-          <p className="mt-0.5 text-[9px] font-medium uppercase tracking-[0.12em] text-indigo-500/80 opacity-70 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+          <p className="mt-0.5 text-[9px] font-medium uppercase tracking-[0.12em] text-slate-500/80 opacity-70 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
             Hover to expand
           </p>
         </div>
@@ -345,14 +345,14 @@ export function ProblemHowItWorks() {
           </FadeUp>
 
           <FadeUp className="flex min-h-[280px] flex-col" delay={0.06}>
-            <p className="mb-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-600/90 lg:text-left">Tractionflo</p>
-            <div className="compare-clean-panel relative flex min-h-[280px] flex-1 flex-col overflow-hidden rounded-2xl border border-indigo-200/55 bg-[linear-gradient(175deg,#ffffff_0%,#f9f8ff_42%,#f1efff_100%)] p-4 shadow-[0_10px_30px_rgba(0,0,0,0.06),0_24px_56px_-36px_rgba(124,92,255,0.28)] ring-1 ring-white/90 sm:p-5">
+            <p className="mb-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 lg:text-left">Tractionflo</p>
+            <div className="compare-clean-panel relative flex min-h-[280px] flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-[linear-gradient(175deg,#ffffff_0%,#f8fafc_42%,#f1f5f9_100%)] p-4 shadow-[0_10px_30px_rgba(0,0,0,0.06),0_24px_56px_-36px_rgba(15,23,42,0.08)] ring-1 ring-white/90 sm:p-5">
               <div className="pointer-events-none absolute -right-20 top-1/4 h-56 w-56 rounded-full bg-violet-400/14 blur-3xl" aria-hidden />
               <div className="pointer-events-none absolute -left-16 bottom-0 h-44 w-44 rounded-full bg-indigo-400/12 blur-2xl" aria-hidden />
 
-              <div className="relative rounded-xl border border-indigo-100/90 bg-white/70 px-4 py-3 text-center shadow-sm backdrop-blur-sm">
+              <div className="relative rounded-xl border border-slate-200/90 bg-white/70 px-4 py-3 text-center shadow-sm backdrop-blur-sm">
                 <p className="text-[13px] font-semibold tracking-tight text-slate-900">10 people · 10 messages · 3 replies</p>
-                <p className="mt-0.5 text-[12px] font-semibold text-indigo-700">Done in 10 minutes</p>
+                <p className="mt-0.5 text-[12px] font-semibold text-slate-600">Done in 10 minutes</p>
               </div>
 
               <TractionfloFlowPath />
@@ -367,7 +367,7 @@ export function ProblemHowItWorks() {
 
         <FadeUp className="relative mx-auto mt-10 min-w-0 max-w-6xl" delay={0.08}>
           <div className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-[min(100%,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-200/15 blur-3xl" aria-hidden />
-          <div className="relative flex min-w-0 flex-col items-stretch rounded-[1.35rem] border border-indigo-100/60 bg-white/40 p-4 shadow-[0_10px_30px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/40 backdrop-blur-md sm:p-5 md:flex-row md:items-start md:justify-between md:gap-1">
+          <div className="relative flex min-w-0 flex-col items-stretch rounded-[1.35rem] border border-slate-200/60 bg-white/40 p-4 shadow-[0_10px_30px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/40 backdrop-blur-md sm:p-5 md:flex-row md:items-start md:justify-between md:gap-1">
             {walkthroughSteps.map(({ title, subtitle, Icon, preview, expanded }, idx) => (
               <Fragment key={title}>
                 <WalkthroughStepCard

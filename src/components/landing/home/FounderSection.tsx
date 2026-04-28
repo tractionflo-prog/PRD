@@ -36,12 +36,14 @@ export function FounderSection() {
         <h2 className="text-center text-[clamp(1.45rem,3vw,1.9rem)] font-semibold tracking-[-0.03em] text-slate-900">
           Built for founders
         </h2>
-        <p className="mx-auto mt-2 max-w-lg text-center text-[15px] text-slate-600">Still validating — and ready for real signal.</p>
+        <p className="mx-auto mt-2 max-w-lg text-center text-[15px] text-slate-600">
+          Still validating — and ready for real signal.
+        </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-3 sm:gap-5">
           {founderFit.map((item) => (
             <article
               key={item.title}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200/50 bg-gradient-to-b from-white to-slate-50/80 p-4 shadow-[0_10px_30px_rgba(0,0,0,0.04)] ring-1 ring-white/90 transition-[transform,box-shadow,border-color] duration-200 [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:border-indigo-200/55 [@media(hover:hover)]:hover:shadow-[0_16px_40px_-24px_rgba(99,102,241,0.18)]"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200/50 bg-gradient-to-b from-white to-slate-50/80 p-4 shadow-[0_10px_30px_rgba(0,0,0,0.04)] ring-1 ring-white/90 transition-[transform,box-shadow,border-color] duration-200 [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:border-slate-300/80 [@media(hover:hover)]:hover:shadow-[0_16px_40px_-24px_rgba(15,23,42,0.1)]"
             >
               <div className="pointer-events-none absolute -right-12 -top-12 h-28 w-28 rounded-full bg-violet-200/20 blur-2xl transition-opacity duration-300 group-hover:opacity-100" aria-hidden />
               <div className="relative flex items-start justify-between gap-2">

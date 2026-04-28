@@ -86,22 +86,41 @@ export const redditLeadProvider: CommunityLeadProvider = {
     const ac = new AbortController();
     const timer = setTimeout(() => ac.abort(), FETCH_TIMEOUT_MS);
     try {
+      console.info("[demand][reddit] search start", {
+        endpoint: REDDIT_SEARCH,
+        query: query.slice(0, 80),
+        limit: lim,
+      });
       const res = await fetch(url, {
         headers: {
           "User-Agent": USER_AGENT,
           Accept: "application/json",
         },
+        cache: "no-store",
         signal: ac.signal,
       });
       if (!res.ok) {
-        console.warn("[demand][reddit] HTTP", res.status);
+        const errText = await res.text().catch(() => "");
+        console.warn("[demand][reddit] HTTP", {
+          status: res.status,
+          statusText: res.statusText,
+          body: errText.slice(0, 220),
+        });
         throw new Error(`reddit_http_${res.status}`);
       }
       const json: unknown = await res.json().catch(() => null);
       if (!json) throw new Error("reddit_json_empty");
-      return parseHits(json, lim);
+      const parsed = parseHits(json, lim);
+      console.info("[demand][reddit] search end", {
+        query: query.slice(0, 80),
+        count: parsed.length,
+      });
+      return parsed;
     } catch (e) {
-      if (e instanceof Error && e.name === "AbortError") throw e;
+      if (e instanceof Error && e.name === "AbortError") {
+        console.warn("[demand][reddit] timeout", { query: query.slice(0, 80) });
+        throw e;
+      }
       if (e instanceof Error && e.message.startsWith("reddit_")) throw e;
       console.warn(
         "[demand][reddit] fetch error",

@@ -55,7 +55,7 @@ export function ProductPreviewSection() {
                               className="h-6 w-6 shrink-0 rounded-full object-cover ring-2 ring-white shadow-sm"
                               sizes="24px"
                             />
-                            <p className="truncate text-[12px] font-semibold text-slate-800">{row.name}</p>
+                            <p className="truncate text-[12px] font-semibold text-slate-900">{row.name}</p>
                           </div>
                           <span className="shrink-0 rounded-full bg-slate-200/90 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-slate-700">
                             {row.status}
@@ -85,15 +85,17 @@ export function ProductPreviewSection() {
           <div>
             <h2 className="text-balance text-[clamp(1.85rem,3vw,2.35rem)] font-semibold tracking-[-0.035em] text-slate-900 sm:leading-[1.1]">
               Everything ready.
-              <span className="block text-indigo-700">You just send.</span>
+              <span className="block text-slate-600">You just send.</span>
             </h2>
-            <p className="mt-4 max-w-md text-[17px] leading-relaxed text-slate-600">One surface: who to reach, what to say, what came back.</p>
+            <p className="mt-4 max-w-md text-[17px] leading-relaxed text-slate-600">
+              One surface: who to reach, what to say, what came back.
+            </p>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl border border-indigo-200/60 bg-gradient-to-br from-indigo-50/90 via-violet-50/50 to-white/90 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] ring-1 ring-white/90">
+          <div className="relative overflow-hidden rounded-2xl border border-slate-200/70 bg-gradient-to-br from-slate-50/90 via-white to-white/90 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] ring-1 ring-white/90">
             <div className="pointer-events-none absolute -right-8 top-0 h-32 w-32 rounded-full bg-violet-300/25 blur-2xl" aria-hidden />
             <div className="relative flex gap-3">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/90 text-indigo-600 shadow-sm ring-1 ring-indigo-100/80">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/90 text-slate-600 shadow-sm ring-1 ring-slate-200/80">
                 <IconCheck className="h-5 w-5" strokeWidth={2.25} />
               </span>
               <div>

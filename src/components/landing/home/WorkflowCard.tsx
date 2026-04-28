@@ -94,10 +94,11 @@ export function WorkflowCard() {
                       <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-500">Workflow</p>
                       <h2 className="text-balance text-[clamp(1.5rem,2.5vw+1rem,1.9rem)] font-semibold tracking-[-0.03em] text-slate-900 sm:leading-[1.12]">
                         You log in.
-                        <span className="block">Everything is already waiting.</span>
+                        <span className="block text-slate-700">Everything is already waiting.</span>
                       </h2>
                       <p className="text-[15px] leading-relaxed text-slate-600 sm:text-[15.5px]">
-                        Your reach list, drafts, and replies are lined up — you show up and send.
+                        Your reach list, drafts, and replies are lined up —{" "}
+                        <span className="font-medium text-slate-800">you show up and send.</span>
                       </p>
                     </div>
                     <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
@@ -111,7 +112,7 @@ export function WorkflowCard() {
                   <div className="mt-6 border-t border-slate-200/60 pt-5">
                     <div className="flex items-baseline justify-between gap-3">
                       <span className="text-[12px] font-medium text-slate-500">Today&apos;s run</span>
-                      <span className="text-[12px] font-semibold tabular-nums tracking-tight text-slate-900">{pct}%</span>
+                      <span className="text-[12px] font-semibold tabular-nums tracking-tight text-slate-700">{pct}%</span>
                     </div>
                     <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-slate-200/70 p-px shadow-[inset_0_1px_2px_rgba(15,23,42,0.06)] ring-1 ring-slate-900/[0.04]">
                       <div
@@ -134,7 +135,7 @@ export function WorkflowCard() {
                 <div className="lg:col-span-5">
                   <PanelShell>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Reach list</p>
-                    <p className="mt-0.5 text-[13px] font-medium text-slate-800">10 people</p>
+                    <p className="mt-0.5 text-[13px] font-medium text-slate-900">10 people</p>
                     <div className="mt-5 max-h-[min(52vh,21rem)] space-y-2 overflow-y-auto overscroll-contain pr-0.5 sm:max-h-[23rem]">
                       {leads.map((lead) => (
                         <div
@@ -162,7 +163,7 @@ export function WorkflowCard() {
                           <span
                             className={`shrink-0 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] transition-colors duration-200 ${
                               lead.tone === "done"
-                                ? "bg-slate-900/[0.06] text-slate-700 ring-1 ring-slate-900/[0.06] [@media(hover:hover)]:group-hover/lead:bg-indigo-50 [@media(hover:hover)]:group-hover/lead:text-indigo-900 [@media(hover:hover)]:group-hover/lead:ring-indigo-100"
+                                ? "bg-slate-900/[0.06] text-slate-700 ring-1 ring-slate-900/[0.06] [@media(hover:hover)]:group-hover/lead:bg-slate-100 [@media(hover:hover)]:group-hover/lead:text-slate-900 [@media(hover:hover)]:group-hover/lead:ring-slate-200/80"
                                 : "bg-amber-100/90 text-amber-950 ring-1 ring-amber-200/60"
                             }`}
                           >
@@ -178,7 +179,7 @@ export function WorkflowCard() {
                 <div className="lg:col-span-4">
                   <PanelShell className="flex min-h-0 flex-col">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Message</p>
-                    <p className="mt-0.5 text-[13px] font-medium text-slate-800">Preview</p>
+                    <p className="mt-0.5 text-[13px] font-medium text-slate-900">Preview</p>
 
                     <div className="relative mt-5 flex-1">
                       <div
@@ -231,7 +232,7 @@ export function WorkflowCard() {
                 <div className="lg:col-span-3">
                   <PanelShell className="flex flex-col">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700/90">Live replies coming in</p>
-                    <p className="mt-0.5 text-[13px] font-medium text-slate-800">Inbox</p>
+                    <p className="mt-0.5 text-[13px] font-medium text-slate-900">Inbox</p>
 
                     <div className="mt-5 flex flex-1 flex-col gap-2.5">
                       {replies.map((r) => (

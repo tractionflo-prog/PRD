@@ -171,7 +171,7 @@ function FeedCard({ post }: { post: FeedPost }) {
         </p>
         <div className="mt-3">
           {post.badge === "opportunity" ? (
-            <span className="inline-flex rounded-full border border-indigo-200/80 bg-gradient-to-r from-indigo-50 to-violet-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-indigo-900 shadow-sm ring-1 ring-indigo-100/60">
+            <span className="inline-flex rounded-full border border-slate-200/80 bg-gradient-to-r from-slate-50 to-slate-100/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-800 shadow-sm ring-1 ring-slate-100/60">
               This is your opportunity
             </span>
           ) : (
