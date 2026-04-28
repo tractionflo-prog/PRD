@@ -30,6 +30,7 @@ const QUERY_SET_FULL = [
   "workflow",
 ] as const;
 const QUERY_SET = IS_PROD ? QUERY_SET_FULL.slice(0, 7) : QUERY_SET_FULL;
+const COMMUNITY_FALLBACK_API = "https://hn.algolia.com/api/v1/search_by_date";
 
 type RejectedDebugItem = {
   source: OpportunitySource;
@@ -125,6 +126,66 @@ function clip(text: string, max = 280): string {
   const t = text.trim();
   if (t.length <= max) return t;
   return `${t.slice(0, max - 1).trimEnd()}…`;
+}
+
+type CommunityFallbackHit = {
+  objectID?: string;
+  title?: string | null;
+  story_title?: string | null;
+  story_text?: string | null;
+  comment_text?: string | null;
+  url?: string | null;
+  story_url?: string | null;
+  created_at_i?: number | null;
+};
+
+type CommunityFallbackResponse = {
+  hits?: CommunityFallbackHit[];
+};
+
+async function fetchCommunityFallbackItems(): Promise<OpportunityItem[]> {
+  const query = "crm OR lead OR client OR workflow OR automate OR spreadsheet";
+  const params = new URLSearchParams({
+    query,
+    tags: "story",
+    hitsPerPage: "24",
+  });
+  const url = `${COMMUNITY_FALLBACK_API}?${params.toString()}`;
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`community_fallback_http_${res.status}`);
+  const json = (await res.json().catch(() => null)) as CommunityFallbackResponse | null;
+  const hits = Array.isArray(json?.hits) ? json.hits : [];
+  const out: OpportunityItem[] = [];
+  for (const h of hits) {
+    const urlValue = (h.url || h.story_url || "").trim();
+    const titleValue = (h.title || h.story_title || "").trim();
+    const snippetValue = (h.story_text || h.comment_text || "").trim();
+    if (!urlValue || !titleValue) continue;
+    const postText = snippetValue ? `${titleValue} — ${snippetValue}` : titleValue;
+    const score = scoreDemandLead({
+      title: titleValue,
+      snippet: snippetValue || titleValue,
+      createdUtc: typeof h.created_at_i === "number" ? h.created_at_i : null,
+      numComments: 0,
+    });
+    out.push({
+      id: `community:${h.objectID || normalizeUrl(urlValue)}`,
+      postText: clip(postText),
+      source: "Community",
+      sourceUrl: urlValue,
+      sourceLabel: "Hacker News",
+      createdUtc: typeof h.created_at_i === "number" ? h.created_at_i : null,
+      intentLabel: score >= HIGH_SCORE ? "High" : "Medium",
+      intentScore: Math.max(44, score),
+      suggestedReply:
+        "Saw your thread and can share a practical workflow that reduces manual follow-ups and keeps client conversations organized. Want the short version?",
+    });
+    if (out.length >= MAX_ITEMS) break;
+  }
+  return mergeUniqueOpportunities(out);
 }
 
 function composeSuggestedReply(hit: ProviderSearchHit, score: number): string {
@@ -383,8 +444,26 @@ async function runFeedPipeline(options?: {
     })
     .slice(0, MAX_ITEMS);
 
+  let finalItems = final;
+  if (finalItems.length === 0) {
+    try {
+      const communityFallback = await fetchCommunityFallbackItems();
+      if (communityFallback.length > 0) {
+        console.info("[opportunities] community fallback used", {
+          count: communityFallback.length,
+        });
+        finalItems = communityFallback.slice(0, MAX_ITEMS);
+      }
+    } catch (error) {
+      console.warn(
+        "[opportunities] community fallback failed",
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  }
+
   console.info("[opportunities] final count", {
-    finalCount: final.length,
+    finalCount: finalItems.length,
     highCount,
     mediumCount,
   });
@@ -402,7 +481,7 @@ async function runFeedPipeline(options?: {
   }
 
   return {
-    items: final,
+    items: finalItems,
     ...(allRejected ? { unavailable: true as const } : {}),
     debug: {
       providers: [
@@ -411,7 +490,7 @@ async function runFeedPipeline(options?: {
           status: statusInfo.status,
           rawCount,
           afterFilterCount: filtered.length,
-          finalCount: final.length,
+          finalCount: finalItems.length,
           ...(statusInfo.error ? { error: statusInfo.error } : {}),
         },
       ],
