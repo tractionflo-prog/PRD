@@ -55,11 +55,57 @@ export type OpportunitiesDebugSnapshot = {
 function normalizeUrl(url: string): string {
   try {
     const u = new URL(url);
+    u.search = "";
     u.hash = "";
     return u.toString();
   } catch {
     return url;
   }
+}
+
+function normalizeText(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function contentFingerprint(title: string, snippet: string): string {
+  const combined = normalizeText(`${title} ${snippet}`.trim());
+  if (!combined) return "";
+  // Keep enough signal words while allowing tiny copy variations.
+  const tokens = combined.split(" ").filter((token) => token.length > 2);
+  return tokens.slice(0, 24).join(" ");
+}
+
+function tokenSet(text: string): Set<string> {
+  return new Set(
+    normalizeText(text)
+      .split(" ")
+      .filter((token) => token.length > 2),
+  );
+}
+
+function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
+  if (a.size === 0 || b.size === 0) return 0;
+  let intersection = 0;
+  for (const t of a) {
+    if (b.has(t)) intersection += 1;
+  }
+  const union = a.size + b.size - intersection;
+  return union > 0 ? intersection / union : 0;
+}
+
+function isNearDuplicatePostText(a: string, b: string): boolean {
+  const na = normalizeText(a);
+  const nb = normalizeText(b);
+  if (!na || !nb) return false;
+  if (na === nb) return true;
+  if (na.length > 100 && nb.length > 100 && (na.includes(nb) || nb.includes(na))) return true;
+  const sim = jaccardSimilarity(tokenSet(na), tokenSet(nb));
+  return sim >= 0.78;
 }
 
 function byRecencyDesc(a: ProviderSearchHit, b: ProviderSearchHit): number {
@@ -180,12 +226,26 @@ function toOpportunity(
   };
 }
 
-function mergeUniqueById(items: OpportunityItem[]): OpportunityItem[] {
+function mergeUniqueOpportunities(items: OpportunityItem[]): OpportunityItem[] {
   const out: OpportunityItem[] = [];
-  const seen = new Set<string>();
+  const seenIds = new Set<string>();
+  const seenUrls = new Set<string>();
+  const seenFingerprints = new Set<string>();
+  const seenBySource: Array<{ source: OpportunitySource; postText: string }> = [];
   for (const item of items) {
-    if (seen.has(item.id)) continue;
-    seen.add(item.id);
+    const normalizedItemUrl = normalizeUrl(item.sourceUrl);
+    const itemFingerprint = contentFingerprint(item.postText, "");
+    const hasNearDuplicate = seenBySource.some(
+      (seenItem) => seenItem.source === item.source && isNearDuplicatePostText(seenItem.postText, item.postText),
+    );
+    if (seenIds.has(item.id)) continue;
+    if (seenUrls.has(normalizedItemUrl)) continue;
+    if (itemFingerprint && seenFingerprints.has(itemFingerprint)) continue;
+    if (hasNearDuplicate) continue;
+    seenIds.add(item.id);
+    seenUrls.add(normalizedItemUrl);
+    if (itemFingerprint) seenFingerprints.add(itemFingerprint);
+    seenBySource.push({ source: item.source, postText: item.postText });
     out.push(item);
   }
   return out;
@@ -294,7 +354,7 @@ async function runFeedPipeline(options?: {
     .map((entry) => entry.item)
     .filter((x): x is OpportunityItem => Boolean(x));
 
-  const filtered = mergeUniqueById([
+  const filtered = mergeUniqueOpportunities([
     ...strict,
     ...fallback48,
     ...fallback42,
