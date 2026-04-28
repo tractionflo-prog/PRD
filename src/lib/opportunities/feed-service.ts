@@ -5,6 +5,8 @@ import {
 } from "@/lib/demand/intent-score";
 import { getLeadProvider } from "@/lib/demand/providers/registry";
 import type { ProviderSearchHit } from "@/lib/demand/providers/types";
+import { getServiceSupabase } from "@/lib/supabase/server";
+import { OFFLINE_OPPORTUNITY_SEED } from "./offline-seed";
 import type { OpportunityItem, OpportunitySource } from "./feed-types";
 
 const MAX_ITEMS = 16;
@@ -15,6 +17,8 @@ const IS_DEV = process.env.NODE_ENV !== "production";
 const IS_PROD = !IS_DEV;
 const PER_QUERY_LIMIT = IS_PROD ? 24 : 60;
 const FEED_TIMEOUT_MS = IS_PROD ? 6_500 : 8_500;
+const CACHE_MAX_AGE_SEC = 60 * 60 * 8;
+const OPPORTUNITIES_TABLE = "opportunities_feed_items";
 
 const QUERY_SET_FULL = [
   "how do you manage",
@@ -39,6 +43,19 @@ type RejectedDebugItem = {
   intentScore: number;
   matchedTerms: string[];
   rejectedReason: string;
+};
+
+type OpportunityCacheRow = {
+  item_id: string;
+  post_text: string;
+  source: OpportunitySource;
+  source_url: string;
+  source_label: string;
+  created_utc: number | null;
+  intent_label: "High" | "Medium";
+  intent_score: number;
+  suggested_reply: string;
+  captured_at: string;
 };
 
 export type OpportunitiesProviderDebug = {
@@ -128,6 +145,94 @@ function clip(text: string, max = 280): string {
   return `${t.slice(0, max - 1).trimEnd()}…`;
 }
 
+function toCacheRow(item: OpportunityItem): Omit<OpportunityCacheRow, "captured_at"> {
+  return {
+    item_id: item.id,
+    post_text: item.postText,
+    source: item.source,
+    source_url: item.sourceUrl,
+    source_label: item.sourceLabel,
+    created_utc: item.createdUtc,
+    intent_label: item.intentLabel,
+    intent_score: item.intentScore,
+    suggested_reply: item.suggestedReply,
+  };
+}
+
+function fromCacheRow(row: OpportunityCacheRow): OpportunityItem {
+  return {
+    id: row.item_id,
+    postText: row.post_text,
+    source: row.source,
+    sourceUrl: row.source_url,
+    sourceLabel: row.source_label,
+    createdUtc: row.created_utc,
+    intentLabel: row.intent_label,
+    intentScore: row.intent_score,
+    suggestedReply: row.suggested_reply,
+  };
+}
+
+async function readOpportunitiesCache(): Promise<{
+  items: OpportunityItem[];
+  capturedAt: string | null;
+}> {
+  const supabase = getServiceSupabase();
+  if (!supabase) return { items: [], capturedAt: null };
+  const { data, error } = await supabase
+    .from(OPPORTUNITIES_TABLE)
+    .select(
+      "item_id, post_text, source, source_url, source_label, created_utc, intent_label, intent_score, suggested_reply, captured_at",
+    )
+    .order("intent_score", { ascending: false })
+    .order("created_utc", { ascending: false })
+    .limit(Math.max(MAX_ITEMS, MIN_VISIBLE_ITEMS));
+  if (error) {
+    console.warn("[opportunities] cache read failed", error.message);
+    return { items: [], capturedAt: null };
+  }
+  const rows = (data ?? []) as OpportunityCacheRow[];
+  const capturedAt = rows[0]?.captured_at ?? null;
+  return {
+    items: mergeUniqueOpportunities(rows.map(fromCacheRow)).slice(
+      0,
+      Math.max(MAX_ITEMS, MIN_VISIBLE_ITEMS),
+    ),
+    capturedAt,
+  };
+}
+
+function isCacheFresh(capturedAt: string | null): boolean {
+  if (!capturedAt) return false;
+  const ts = Date.parse(capturedAt);
+  if (!Number.isFinite(ts)) return false;
+  return Date.now() - ts <= CACHE_MAX_AGE_SEC * 1000;
+}
+
+async function writeOpportunitiesCache(items: OpportunityItem[]): Promise<void> {
+  const supabase = getServiceSupabase();
+  if (!supabase) return;
+  const kept = mergeUniqueOpportunities(items).slice(0, Math.max(MAX_ITEMS, MIN_VISIBLE_ITEMS));
+  const stamp = new Date().toISOString();
+  const rows = kept.map((item) => ({
+    ...toCacheRow(item),
+    captured_at: stamp,
+  }));
+  const { error: deleteError } = await supabase
+    .from(OPPORTUNITIES_TABLE)
+    .delete()
+    .neq("item_id", "__none__");
+  if (deleteError) {
+    console.warn("[opportunities] cache clear failed", deleteError.message);
+    return;
+  }
+  if (rows.length === 0) return;
+  const { error: insertError } = await supabase.from(OPPORTUNITIES_TABLE).insert(rows);
+  if (insertError) {
+    console.warn("[opportunities] cache write failed", insertError.message);
+  }
+}
+
 type CommunityFallbackHit = {
   objectID?: string;
   title?: string | null;
@@ -188,6 +293,20 @@ async function fetchCommunityFallbackItems(): Promise<OpportunityItem[]> {
   return mergeUniqueOpportunities(out);
 }
 
+function getOfflineSeedItems(): OpportunityItem[] {
+  return OFFLINE_OPPORTUNITY_SEED.map((row, index) => ({
+    id: `offline:${index + 1}`,
+    postText: clip(row.postText),
+    source: row.source,
+    sourceUrl: row.sourceUrl,
+    sourceLabel: row.sourceLabel,
+    createdUtc: row.createdUtc,
+    intentLabel: row.intentLabel,
+    intentScore: row.intentScore,
+    suggestedReply: row.suggestedReply,
+  }));
+}
+
 function composeSuggestedReply(hit: ProviderSearchHit, score: number): string {
   const context = explainDemandIntent(hit.title, hit.snippet, score)
     .split("\n")
@@ -215,6 +334,18 @@ function hasHighIntentAsk(text: string): boolean {
 
 function hasMediumIntentPain(text: string): boolean {
   return /\b(struggling with|tired of|manual process|spreadsheet|messy|chaos|workflow pain|follow up|follow-up|not scalable|frustrated)\b/i.test(
+    text,
+  );
+}
+
+function hasBusinessContext(text: string): boolean {
+  return /\b(crm|lead|pipeline|follow up|follow-up|client|customer|prospect|sales|outreach|inbound|conversion|agency|founder|startup|saas|team|ops|operations|workflow|automation|onboarding|retention|revenue|invoic|billing)\b/i.test(
+    text,
+  );
+}
+
+function hasDisallowedPersonalContext(text: string): boolean {
+  return /\b(relationship|dating|boyfriend|girlfriend|husband|wife|partner|sexual|sex|hookup|body count|pregnan|family drama|roommate drama|mental health|depress|anxiety|aita|am i overreacting)\b/i.test(
     text,
   );
 }
@@ -258,8 +389,35 @@ function toOpportunity(
   }
 
   const signalText = `${hit.title}\n${hit.snippet}`;
+  if (hasDisallowedPersonalContext(signalText)) {
+    return {
+      item: null,
+      rejected: {
+        source: sourceFromHit(hit),
+        title: clip(hit.title, 180),
+        url: hit.url,
+        intentScore: score,
+        matchedTerms: getMatchedTerms(hit.title, hit.snippet, score),
+        rejectedReason: "personal_context_filtered",
+      },
+    };
+  }
   const highAsk = hasHighIntentAsk(signalText);
   const mediumPain = hasMediumIntentPain(signalText);
+  const businessContext = hasBusinessContext(signalText);
+  if (!businessContext) {
+    return {
+      item: null,
+      rejected: {
+        source: sourceFromHit(hit),
+        title: clip(hit.title, 180),
+        url: hit.url,
+        intentScore: score,
+        matchedTerms: getMatchedTerms(hit.title, hit.snippet, score),
+        rejectedReason: "missing_business_context",
+      },
+    };
+  }
   if (!highAsk && !mediumPain) {
     return {
       item: null,
@@ -461,6 +619,16 @@ async function runFeedPipeline(options?: {
       );
     }
   }
+  if (finalItems.length < MIN_VISIBLE_ITEMS) {
+    const seeded = getOfflineSeedItems();
+    finalItems = mergeUniqueOpportunities([...finalItems, ...seeded]).slice(
+      0,
+      Math.max(MAX_ITEMS, MIN_VISIBLE_ITEMS),
+    );
+    console.info("[opportunities] offline seed fallback used", {
+      count: finalItems.length,
+    });
+  }
 
   console.info("[opportunities] final count", {
     finalCount: finalItems.length,
@@ -511,22 +679,47 @@ export async function getPublicOpportunitiesFeed(): Promise<{
   debugEmptyReason?: string;
 }> {
   try {
+    const cached = await readOpportunitiesCache();
+    if (cached.items.length >= MIN_VISIBLE_ITEMS && isCacheFresh(cached.capturedAt)) {
+      return {
+        items: cached.items,
+        updatedAt: cached.capturedAt ?? new Date().toISOString(),
+      };
+    }
     const out = await Promise.race([
       runFeedPipeline(),
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("feed_timeout")), FEED_TIMEOUT_MS),
       ),
     ]);
+    const liveItems = out.items;
+    if (liveItems.length >= MIN_VISIBLE_ITEMS || cached.items.length === 0) {
+      await writeOpportunitiesCache(liveItems);
+    }
+    const chosenItems =
+      liveItems.length >= MIN_VISIBLE_ITEMS
+        ? liveItems
+        : mergeUniqueOpportunities([...cached.items, ...liveItems]).slice(
+            0,
+            Math.max(MAX_ITEMS, MIN_VISIBLE_ITEMS),
+          );
     return {
-      items: out.items,
+      items: chosenItems,
       updatedAt: new Date().toISOString(),
       ...(out.unavailable ? { unavailable: true as const } : {}),
-      ...(IS_DEV && out.items.length === 0
+      ...(IS_DEV && chosenItems.length === 0
         ? { debugEmptyReason: out.unavailable ? "provider_unavailable" : "filtered_out_by_quality" }
         : {}),
     };
   } catch (error) {
     console.warn("[opportunities] feed fallback", error instanceof Error ? error.message : String(error));
+    const cached = await readOpportunitiesCache();
+    if (cached.items.length > 0) {
+      return {
+        items: cached.items,
+        updatedAt: cached.capturedAt ?? new Date().toISOString(),
+      };
+    }
     return {
       items: [],
       updatedAt: new Date().toISOString(),

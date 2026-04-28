@@ -34,6 +34,10 @@ export function hardExcludeDemandPost(text: string): boolean {
     /\b(for hire|freelance gig|upwork|fiverr)\b/i,
     /\b(self[\s-]?promo|my startup|check out my (saas|product|course)|50% off|affiliate link)\b/i,
     /\b(promoted|sponsored by|giveaway)\b/i,
+    /\b(relationship advice|my partner|my boyfriend|my girlfriend|ex[-\s]?boyfriend|ex[-\s]?girlfriend|dating advice)\b/i,
+    /\b(sexual past|sex life|sex advice|intimacy issues|hookup|body count|virgin)\b/i,
+    /\b(am i overreacting|aita|am i the asshole|who is wrong here)\b/i,
+    /\b(mental health rant|family drama|roommate drama)\b/i,
   ];
   return patterns.some((re) => re.test(t));
 }
