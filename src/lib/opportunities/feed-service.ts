@@ -8,13 +8,15 @@ import type { ProviderSearchHit } from "@/lib/demand/providers/types";
 import type { OpportunityItem, OpportunitySource } from "./feed-types";
 
 const MAX_ITEMS = 16;
-const PER_QUERY_LIMIT = 60;
 const MIN_SCORE = 44;
 const HIGH_SCORE = 76;
 const MIN_VISIBLE_ITEMS = 10;
-const FEED_TIMEOUT_MS = 8_500;
+const IS_DEV = process.env.NODE_ENV !== "production";
+const IS_PROD = !IS_DEV;
+const PER_QUERY_LIMIT = IS_PROD ? 24 : 60;
+const FEED_TIMEOUT_MS = IS_PROD ? 6_500 : 8_500;
 
-const QUERY_SET = [
+const QUERY_SET_FULL = [
   "how do you manage",
   "what do you use for",
   "anyone using",
@@ -27,8 +29,7 @@ const QUERY_SET = [
   "crm",
   "workflow",
 ] as const;
-
-const IS_DEV = process.env.NODE_ENV !== "production";
+const QUERY_SET = IS_PROD ? QUERY_SET_FULL.slice(0, 7) : QUERY_SET_FULL;
 
 type RejectedDebugItem = {
   source: OpportunitySource;

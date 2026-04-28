@@ -1,7 +1,7 @@
 import type { CommunityLeadProvider, ProviderSearchHit } from "./types";
 
 const REDDIT_SEARCH = "https://www.reddit.com/search.json";
-const FETCH_TIMEOUT_MS = 7_000;
+const FETCH_TIMEOUT_MS = process.env.NODE_ENV === "production" ? 4_000 : 7_000;
 const USER_AGENT =
   "Tractionflo/1.0 (demand; +https://tractionflo.com; Reddit search only)";
 
