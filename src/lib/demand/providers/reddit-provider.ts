@@ -5,6 +5,25 @@ const REDDIT_SEARCH_RSS = "https://www.reddit.com/search.rss";
 const FETCH_TIMEOUT_MS = process.env.NODE_ENV === "production" ? 4_000 : 7_000;
 const USER_AGENT =
   "Tractionflo/1.0 (demand; +https://tractionflo.com; Reddit search only)";
+const FALLBACK_SUBREDDITS = [
+  "SaaS",
+  "smallbusiness",
+  "Entrepreneur",
+  "startups",
+  "marketing",
+  "sales",
+] as const;
+const BASELINE_TERMS = [
+  "crm",
+  "lead",
+  "client",
+  "workflow",
+  "automation",
+  "follow up",
+  "spreadsheet",
+  "process",
+  "tool",
+];
 
 function listingChildren(json: unknown): unknown[] {
   if (!json || typeof json !== "object") return [];
@@ -128,6 +147,72 @@ function parseRssHits(xml: string, limit: number): ProviderSearchHit[] {
   return out;
 }
 
+function queryTerms(query: string): string[] {
+  const stop = new Set(["how", "do", "you", "use", "for", "anyone", "with", "the", "and", "what"]);
+  return query
+    .toLowerCase()
+    .split(/\s+/)
+    .map((x) => x.trim())
+    .filter((x) => x.length > 2 && !stop.has(x));
+}
+
+function relevanceScore(hit: ProviderSearchHit, query: string): number {
+  const hay = `${hit.title}\n${hit.snippet}`.toLowerCase();
+  const qTerms = queryTerms(query);
+  let score = 0;
+  for (const t of qTerms) {
+    if (hay.includes(t)) score += 2;
+  }
+  for (const t of BASELINE_TERMS) {
+    if (hay.includes(t)) score += 1;
+  }
+  if (/\b(help|recommend|suggest|alternative|how do you|what tool)\b/i.test(hay)) score += 2;
+  return score;
+}
+
+async function subredditRssFallback(
+  query: string,
+  limit: number,
+  signal: AbortSignal,
+): Promise<ProviderSearchHit[]> {
+  const urls = FALLBACK_SUBREDDITS.map(
+    (sub) => `https://www.reddit.com/r/${sub}/new.rss?limit=${Math.max(12, Math.min(40, limit))}`,
+  );
+  const settled = await Promise.allSettled(
+    urls.map((url) =>
+      fetch(url, {
+        headers: {
+          "User-Agent": USER_AGENT,
+          Accept: "application/rss+xml, application/xml, text/xml",
+        },
+        cache: "no-store",
+        signal,
+      }),
+    ),
+  );
+  const merged: ProviderSearchHit[] = [];
+  for (const res of settled) {
+    if (res.status !== "fulfilled") continue;
+    if (!res.value.ok) continue;
+    const xml = await res.value.text().catch(() => "");
+    if (!xml) continue;
+    merged.push(...parseRssHits(xml, limit));
+  }
+  const uniq = new Map<string, ProviderSearchHit>();
+  for (const hit of merged) {
+    if (!uniq.has(hit.url)) uniq.set(hit.url, hit);
+  }
+  return Array.from(uniq.values())
+    .map((hit) => ({ hit, rank: relevanceScore(hit, query) }))
+    .filter((x) => x.rank > 0)
+    .sort((a, b) => {
+      if (b.rank !== a.rank) return b.rank - a.rank;
+      return (b.hit.createdUtc ?? 0) - (a.hit.createdUtc ?? 0);
+    })
+    .slice(0, limit)
+    .map((x) => x.hit);
+}
+
 export const redditLeadProvider: CommunityLeadProvider = {
   id: "reddit",
 
@@ -194,6 +279,14 @@ export const redditLeadProvider: CommunityLeadProvider = {
           const rssText = await rssRes.text().catch(() => "");
           if (!rssText) throw new Error("reddit_rss_empty");
           const rssParsed = parseRssHits(rssText, lim);
+          if (rssParsed.length === 0) {
+            const subParsed = await subredditRssFallback(query, lim, ac.signal);
+            console.info("[demand][reddit] subreddit RSS fallback end", {
+              query: query.slice(0, 80),
+              count: subParsed.length,
+            });
+            return subParsed;
+          }
           console.info("[demand][reddit] RSS fallback end", {
             query: query.slice(0, 80),
             count: rssParsed.length,
