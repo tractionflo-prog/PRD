@@ -17,7 +17,11 @@ const IS_DEV = process.env.NODE_ENV !== "production";
 const IS_PROD = !IS_DEV;
 const PER_QUERY_LIMIT = IS_PROD ? 24 : 60;
 const FEED_TIMEOUT_MS = IS_PROD ? 6_500 : 8_500;
-const CACHE_MAX_AGE_SEC = 60 * 60 * 8;
+const CACHE_MAX_AGE_SEC = Math.max(
+  30,
+  Number(process.env.OPPORTUNITIES_CACHE_MAX_AGE_SEC ?? (IS_PROD ? 900 : 120)),
+);
+const CACHE_DISABLED = process.env.OPPORTUNITIES_DISABLE_CACHE === "1";
 const OPPORTUNITIES_TABLE = "opportunities_feed_items";
 
 const QUERY_SET_FULL = [
@@ -680,7 +684,7 @@ export async function getPublicOpportunitiesFeed(): Promise<{
 }> {
   try {
     const cached = await readOpportunitiesCache();
-    if (cached.items.length >= MIN_VISIBLE_ITEMS && isCacheFresh(cached.capturedAt)) {
+    if (!CACHE_DISABLED && cached.items.length >= MIN_VISIBLE_ITEMS && isCacheFresh(cached.capturedAt)) {
       return {
         items: cached.items,
         updatedAt: cached.capturedAt ?? new Date().toISOString(),
