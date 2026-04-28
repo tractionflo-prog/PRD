@@ -12,6 +12,10 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+export const maxDuration = 15;
+
+const PAGE_FEED_TIMEOUT_MS = 5_500;
 
 type ThemeRow = {
   name: string;
@@ -85,7 +89,20 @@ function getProblemThemes(items: OpportunityItem[]): ThemeRow[] {
 }
 
 export default async function OpportunitiesPage() {
-  const feed = await getPublicOpportunitiesFeed();
+  const feed = await Promise.race([
+    getPublicOpportunitiesFeed(),
+    new Promise<Awaited<ReturnType<typeof getPublicOpportunitiesFeed>>>((resolve) =>
+      setTimeout(
+        () =>
+          resolve({
+            items: [],
+            updatedAt: new Date().toISOString(),
+            unavailable: true,
+          }),
+        PAGE_FEED_TIMEOUT_MS,
+      ),
+    ),
+  ]);
   const showEmpty = feed.items.length === 0;
   const featured = feed.items.slice(0, Math.min(3, feed.items.length));
   const remaining = feed.items.slice(featured.length);

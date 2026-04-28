@@ -1,6 +1,7 @@
 import type { CommunityLeadProvider, ProviderSearchHit } from "./types";
 
 const REDDIT_SEARCH = "https://www.reddit.com/search.json";
+const REDDIT_SEARCH_RSS = "https://www.reddit.com/search.rss";
 const FETCH_TIMEOUT_MS = process.env.NODE_ENV === "production" ? 4_000 : 7_000;
 const USER_AGENT =
   "Tractionflo/1.0 (demand; +https://tractionflo.com; Reddit search only)";
@@ -70,6 +71,63 @@ function parseHits(json: unknown, limit: number): ProviderSearchHit[] {
   return out;
 }
 
+function decodeXmlEntities(text: string): string {
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
+function stripTags(text: string): string {
+  return decodeXmlEntities(text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+}
+
+function parseRssTag(block: string, tag: string): string {
+  const re = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "i");
+  const match = block.match(re);
+  return match?.[1]?.trim() ?? "";
+}
+
+function parseRssHits(xml: string, limit: number): ProviderSearchHit[] {
+  const out: ProviderSearchHit[] = [];
+  const itemBlocks = xml.match(/<item>[\s\S]*?<\/item>/gi) ?? [];
+  for (const block of itemBlocks) {
+    if (out.length >= limit) break;
+    const rawTitle = parseRssTag(block, "title");
+    const rawLink = parseRssTag(block, "link");
+    if (!rawTitle || !rawLink) continue;
+    const title = stripTags(rawTitle);
+    const url = stripTags(rawLink);
+    const guid = stripTags(parseRssTag(block, "guid")) || url;
+    const id = `reddit:rss:${guid.replace(/\W/g, "").slice(0, 64)}`;
+    const category = stripTags(parseRssTag(block, "category"));
+    const authorRaw = stripTags(parseRssTag(block, "author"));
+    const author = authorRaw || "[deleted]";
+    const description = stripTags(parseRssTag(block, "description"));
+    const snippet = (description || title).slice(0, 560);
+    let createdUtc: number | null = null;
+    const pubDate = stripTags(parseRssTag(block, "pubDate"));
+    if (pubDate) {
+      const ts = Date.parse(pubDate);
+      if (Number.isFinite(ts)) createdUtc = Math.floor(ts / 1000);
+    }
+    out.push({
+      id,
+      source: "reddit",
+      title,
+      subreddit: category.replace(/^r\//i, "") || "unknown",
+      author,
+      url,
+      snippet,
+      createdUtc,
+      numComments: 0,
+    });
+  }
+  return out;
+}
+
 export const redditLeadProvider: CommunityLeadProvider = {
   id: "reddit",
 
@@ -83,6 +141,12 @@ export const redditLeadProvider: CommunityLeadProvider = {
       raw_json: "1",
     });
     const url = `${REDDIT_SEARCH}?${params.toString()}`;
+    const rssParams = new URLSearchParams({
+      q: query.slice(0, 512),
+      sort: "new",
+      t: "week",
+    });
+    const rssUrl = `${REDDIT_SEARCH_RSS}?${rssParams.toString()}`;
     const ac = new AbortController();
     const timer = setTimeout(() => ac.abort(), FETCH_TIMEOUT_MS);
     try {
@@ -106,6 +170,36 @@ export const redditLeadProvider: CommunityLeadProvider = {
           statusText: res.statusText,
           body: errText.slice(0, 220),
         });
+        if (res.status === 403) {
+          console.info("[demand][reddit] attempting RSS fallback", {
+            query: query.slice(0, 80),
+          });
+          const rssRes = await fetch(rssUrl, {
+            headers: {
+              "User-Agent": USER_AGENT,
+              Accept: "application/rss+xml, application/xml, text/xml",
+            },
+            cache: "no-store",
+            signal: ac.signal,
+          });
+          if (!rssRes.ok) {
+            const rssErrText = await rssRes.text().catch(() => "");
+            console.warn("[demand][reddit] RSS HTTP", {
+              status: rssRes.status,
+              statusText: rssRes.statusText,
+              body: rssErrText.slice(0, 220),
+            });
+            throw new Error(`reddit_rss_http_${rssRes.status}`);
+          }
+          const rssText = await rssRes.text().catch(() => "");
+          if (!rssText) throw new Error("reddit_rss_empty");
+          const rssParsed = parseRssHits(rssText, lim);
+          console.info("[demand][reddit] RSS fallback end", {
+            query: query.slice(0, 80),
+            count: rssParsed.length,
+          });
+          return rssParsed;
+        }
         throw new Error(`reddit_http_${res.status}`);
       }
       const json: unknown = await res.json().catch(() => null);
