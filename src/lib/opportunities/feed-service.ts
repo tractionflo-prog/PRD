@@ -354,6 +354,18 @@ function hasDisallowedPersonalContext(text: string): boolean {
   );
 }
 
+function hasDisallowedLowIntentContext(text: string): boolean {
+  return /\b(onlyfans|of model|playtester|minecraft|mod launcher|army|battalion|74d|airbnb host|youtube outlier|facebook post|join our agency|new models|we are onboarding)\b/i.test(
+    text,
+  );
+}
+
+function hasRelevantSubredditContext(subreddit: string): boolean {
+  return /\b(saas|startups?|smallbusiness|entrepreneur|sales|marketing|agency|freelance|notion|productivity|crm|business|founder|solopreneur)\b/i.test(
+    subreddit,
+  );
+}
+
 function toOpportunity(
   hit: ProviderSearchHit,
   minScore: number,
@@ -393,6 +405,32 @@ function toOpportunity(
   }
 
   const signalText = `${hit.title}\n${hit.snippet}`;
+  if (!hasRelevantSubredditContext(hit.subreddit || "")) {
+    return {
+      item: null,
+      rejected: {
+        source: sourceFromHit(hit),
+        title: clip(hit.title, 180),
+        url: hit.url,
+        intentScore: score,
+        matchedTerms: getMatchedTerms(hit.title, hit.snippet, score),
+        rejectedReason: "subreddit_not_relevant",
+      },
+    };
+  }
+  if (hasDisallowedLowIntentContext(signalText)) {
+    return {
+      item: null,
+      rejected: {
+        source: sourceFromHit(hit),
+        title: clip(hit.title, 180),
+        url: hit.url,
+        intentScore: score,
+        matchedTerms: getMatchedTerms(hit.title, hit.snippet, score),
+        rejectedReason: "low_intent_context_filtered",
+      },
+    };
+  }
   if (hasDisallowedPersonalContext(signalText)) {
     return {
       item: null,
@@ -685,6 +723,12 @@ export async function getPublicOpportunitiesFeed(): Promise<{
   try {
     const cached = await readOpportunitiesCache();
     if (!CACHE_DISABLED && cached.items.length >= MIN_VISIBLE_ITEMS && isCacheFresh(cached.capturedAt)) {
+      console.info("[opportunities] serve path", {
+        path: "cache_fresh",
+        finalCount: cached.items.length,
+        cacheCapturedAt: cached.capturedAt,
+        cacheDisabled: CACHE_DISABLED,
+      });
       return {
         items: cached.items,
         updatedAt: cached.capturedAt ?? new Date().toISOString(),
@@ -697,9 +741,6 @@ export async function getPublicOpportunitiesFeed(): Promise<{
       ),
     ]);
     const liveItems = out.items;
-    if (liveItems.length >= MIN_VISIBLE_ITEMS || cached.items.length === 0) {
-      await writeOpportunitiesCache(liveItems);
-    }
     const chosenItems =
       liveItems.length >= MIN_VISIBLE_ITEMS
         ? liveItems
@@ -707,9 +748,20 @@ export async function getPublicOpportunitiesFeed(): Promise<{
             0,
             Math.max(MAX_ITEMS, MIN_VISIBLE_ITEMS),
           );
+    if (chosenItems.length > 0) {
+      await writeOpportunitiesCache(chosenItems);
+    }
+    const updatedAt = new Date().toISOString();
+    console.info("[opportunities] serve path", {
+      path: liveItems.length >= MIN_VISIBLE_ITEMS ? "live_refresh" : "cache_live_merge",
+      finalCount: chosenItems.length,
+      liveCount: liveItems.length,
+      cacheCount: cached.items.length,
+      cacheDisabled: CACHE_DISABLED,
+    });
     return {
       items: chosenItems,
-      updatedAt: new Date().toISOString(),
+      updatedAt,
       ...(out.unavailable ? { unavailable: true as const } : {}),
       ...(IS_DEV && chosenItems.length === 0
         ? { debugEmptyReason: out.unavailable ? "provider_unavailable" : "filtered_out_by_quality" }
@@ -719,11 +771,22 @@ export async function getPublicOpportunitiesFeed(): Promise<{
     console.warn("[opportunities] feed fallback", error instanceof Error ? error.message : String(error));
     const cached = await readOpportunitiesCache();
     if (cached.items.length > 0) {
+      console.info("[opportunities] serve path", {
+        path: "cache_on_error",
+        finalCount: cached.items.length,
+        cacheCapturedAt: cached.capturedAt,
+        cacheDisabled: CACHE_DISABLED,
+      });
       return {
         items: cached.items,
         updatedAt: cached.capturedAt ?? new Date().toISOString(),
       };
     }
+    console.info("[opportunities] serve path", {
+      path: "empty_on_error",
+      finalCount: 0,
+      cacheDisabled: CACHE_DISABLED,
+    });
     return {
       items: [],
       updatedAt: new Date().toISOString(),
